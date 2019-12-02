@@ -1,1 +1,1 @@
-set hive.llap.execution.mode=none;
+set hive.llap.execution.mode=only;
