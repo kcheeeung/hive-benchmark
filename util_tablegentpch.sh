@@ -1,6 +1,13 @@
 #!/bin/bash
 
 if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
+    if [[ "$2" == "orc" || "$2" == "parquet" ]]; then
+        echo "File format ok"
+    else
+        echo "Invalid file format"
+        exit 1
+    fi
+
     # scale ~GB
     INPUT_SCALE="$1"
     # Name of clock file
@@ -27,8 +34,15 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     echo "Table gen time" >> $CLOCK_FILE
     TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
-    # orc tables
-    beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql -hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
+    if [[ "$2" == "orc" ]]; then
+        # orc tables
+        echo "generating orc tables"
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql -hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
+    else
+        # parquet tables
+        echo "generating parquet tables"
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllParquetTables.hql -hiveconf ORCDBNAME=tpch_parquet_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
+    fi
 
     echo "ORC Table gen time" >> $CLOCK_FILE
     echo "End time" >> $CLOCK_FILE

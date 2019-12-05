@@ -1,6 +1,13 @@
 #!/bin/bash
 
 if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
+    if [[ "$2" == "orc" || "$2" == "parquet" ]]; then
+        echo "File format ok"
+    else
+        echo "Invalid file format"
+        exit 1
+    fi
+
     # query file name
     QUERY_BASE_NAME="tpch_queries/tpch_query"
     QUERY_FILE_EXT=".hql"
@@ -12,7 +19,11 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     # report name
     REPORT_NAME="time_elapsed_tpch"
     # database name
-    DATABASE="tpch_orc_"$SCALE
+    if [[ "$2" == "orc" ]]; then
+        DATABASE="tpch_orc_"$SCALE
+    else
+        DATABASE="tpch_parquet_"$SCALE
+    fi
     # hostname
     HOSTNAME=`hostname`
     # Clock file
