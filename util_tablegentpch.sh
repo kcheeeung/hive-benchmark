@@ -20,42 +20,49 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
 
     echo "Start time" >> $CLOCK_FILE
     TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "" >> $CLOCK_FILE
 
     # data generation
     hdfs dfs -copyFromLocal tpch_resources /tmp
     beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsData.hql -f TPCHDataGen.hql -hiveconf SCALE=$INPUT_SCALE -hiveconf PARTS=$INPUT_SCALE -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf TPCHBIN=`grep -A 1 "fs.defaultFS" /etc/hadoop/conf/core-site.xml | grep -o "wasb[^<]*"`/tmp/tpch_resources
-    echo "Data gen time" >> $CLOCK_FILE
+    echo "Data gen finish" >> $CLOCK_FILE
     TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "" >> $CLOCK_FILE
 
     # table creation
     hdfs dfs -mkdir -p /HiveTPCH_$INPUT_SCALE/
     hadoop fs -chmod -R 777 /HiveTPCH_$INPUT_SCALE/
     beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllExternalTables.hql -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf DBNAME=tpch_$INPUT_SCALE
-    echo "Table gen time" >> $CLOCK_FILE
+    echo "Table gen finish" >> $CLOCK_FILE
     TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "" >> $CLOCK_FILE
 
     if [[ "$2" == "orc" ]]; then
         # orc tables
-        echo "generating orc tables"
+        echo "generating orc tables" >> $CLOCK_FILE
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql -hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
-        echo "ORC gen time" >> $CLOCK_FILE
+        echo "ORC gen finish" >> $CLOCK_FILE
         TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "" >> $CLOCK_FILE
         
         echo "analyze orc"
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_orc_$INPUT_SCALE
-        echo "analyze time" >> $CLOCK_FILE
+        echo "analyze finish" >> $CLOCK_FILE
         TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "" >> $CLOCK_FILE
     else
         # parquet tables
         echo "generating parquet tables"
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllParquetTables.hql -hiveconf PARQUETDBNAME=tpch_parquet_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
-        echo "parquet gen time" >> $CLOCK_FILE
+        echo "parquet gen finish" >> $CLOCK_FILE
         TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "" >> $CLOCK_FILE
 
         echo "analyze parquet"
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_parquet_$INPUT_SCALE
-        echo "analyze time" >> $CLOCK_FILE
+        echo "analyze finish" >> $CLOCK_FILE
         TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "" >> $CLOCK_FILE
     fi
 
     echo "End time" >> $CLOCK_FILE
