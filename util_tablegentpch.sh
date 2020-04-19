@@ -1,10 +1,23 @@
 #!/bin/bash
 
+function timedate() {
+    TZ="America/Los_Angeles" date
+}
+
+if [[ "$#" -ne 2 ]]; then
+    echo "Incorrect number of arguments."
+    echo "Usage is as follows:"
+    echo "sh util_tablgentpch.sh SCALE FORMAT"
+    exit 1
+fi
+
 if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     if [[ "$2" == "orc" || "$2" == "parquet" ]]; then
         echo "File format ok"
     else
-        echo "Invalid file format"
+        echo "Invalid. Supported formats are:"
+        echo "orc"
+        echo "parquet"
         exit 1
     fi
 
@@ -16,57 +29,63 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     rm $CLOCK_FILE
     echo "Old clock removed"
     echo "Created new clock"
-    echo "Table gen time for TPC-H "$SCALE > $CLOCK_FILE
-
-    echo "Start time" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "Table gen time for TPC-H $INPUT_SCALE" > $CLOCK_FILE
+    timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
 
     # data generation
+    echo "Start data generation" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
     hdfs dfs -copyFromLocal tpch_resources /tmp
     beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsData.hql -f TPCHDataGen.hql -hiveconf SCALE=$INPUT_SCALE -hiveconf PARTS=$INPUT_SCALE -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf TPCHBIN=`grep -A 1 "fs.defaultFS" /etc/hadoop/conf/core-site.xml | grep -o "wasb[^<]*"`/tmp/tpch_resources
-    echo "Data gen finish" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "End" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
 
     # table creation
+    echo "Start table generation" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
     hdfs dfs -mkdir -p /HiveTPCH_$INPUT_SCALE/
     hadoop fs -chmod -R 777 /HiveTPCH_$INPUT_SCALE/
     beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllExternalTables.hql -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf DBNAME=tpch_$INPUT_SCALE
-    echo "Table gen finish" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "End" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
 
     if [[ "$2" == "orc" ]]; then
         # orc tables
-        echo "generating orc tables" >> $CLOCK_FILE
+        echo "Start orc table generation" >> $CLOCK_FILE
+        timedate >> $CLOCK_FILE
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql -hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
-        echo "ORC gen finish" >> $CLOCK_FILE
-        TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "End" >> $CLOCK_FILE
+        timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
         
-        echo "analyze orc"
+        echo "Start orc analysis"
+        timedate >> $CLOCK_FILE
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_orc_$INPUT_SCALE
-        echo "analyze finish" >> $CLOCK_FILE
-        TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "End" >> $CLOCK_FILE
+        timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
     else
         # parquet tables
-        echo "generating parquet tables"
+        echo "Start parquet table generation"
+        timedate >> $CLOCK_FILE
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllParquetTables.hql -hiveconf PARQUETDBNAME=tpch_parquet_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
-        echo "parquet gen finish" >> $CLOCK_FILE
-        TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "End" >> $CLOCK_FILE
+        timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
 
-        echo "analyze parquet"
+        echo "Start parquet analysis"
+        timedate >> $CLOCK_FILE
         beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_parquet_$INPUT_SCALE
-        echo "analyze finish" >> $CLOCK_FILE
-        TZ='America/Los_Angeles' date >> $CLOCK_FILE
+        echo "End" >> $CLOCK_FILE
+        timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
     fi
 
     echo "End time" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
 else
-    echo "Invalid entry. Scale must also be greater than 1."
+    echo "Scale must be greater than 1."
 fi
