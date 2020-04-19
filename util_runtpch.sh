@@ -1,10 +1,25 @@
 #!/bin/bash
 
+function timedate() {
+    TZ="America/Los_Angeles" date
+}
+
+ID=`TZ="America/Los_Angeles" date +"%m.%d.%Y-%H.%M.%S"`
+
+if [[ "$#" -ne 2 ]]; then
+    echo "Incorrect number of arguments."
+    echo "Usage is as follows:"
+    echo "sh util_runtpch.sh SCALE FORMAT"
+    exit 1
+fi
+
 if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     if [[ "$2" == "orc" || "$2" == "parquet" ]]; then
         echo "File format ok"
     else
-        echo "Invalid file format"
+        echo "Invalid. Supported formats are:"
+        echo "orc"
+        echo "parquet"
         exit 1
     fi
 
@@ -31,8 +46,8 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     rm $CLOCK_FILE
     echo "Old clock removed"
     echo "Created new clock"
-    echo "Run queries for TPC-H at scale "$SCALE > $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "Run queries for TPC-H at scale $SCALE" > $CLOCK_FILE
+    timedate >> $CLOCK_FILE
 
     # generate time report
     rm $REPORT_NAME*".csv"
@@ -50,15 +65,13 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     mkdir log_query/
     echo "Log folder generated"
 
-    # # make executable
-    # chmod +x util_internalGetPAT.sh
-    # chmod +x util_internalRunQuery.sh
-    # chmod -R +x PAT/
+    # make executable
+    chmod +x *".sh"
+    chmod -R +x PAT/
 
     # absolute path
     CURR_DIR="`pwd`/"
 
-    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M"`
     # range of queries
     START=1
     END=22
@@ -73,8 +86,8 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
 
     done
 
-    echo "Finished" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    echo "End" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
 
     python3 parselog.py
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
@@ -82,5 +95,5 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     zip -r "tpch-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
     rm log_query.zip
 else
-    echo "Invalid entry. Scale must also be greater than 1."
+    echo "Scale must be greater than 1."
 fi
