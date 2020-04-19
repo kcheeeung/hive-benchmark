@@ -1,4 +1,4 @@
-USE ${hiveconf:ORCDBNAME};
+USE ${hiveconf:DB};
 
 analyze table call_center compute statistics for columns;
 analyze table catalog_page compute statistics for columns;

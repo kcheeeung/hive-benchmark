@@ -1,9 +1,9 @@
 SET mapred.reduce.tasks=${hiveconf:PARTS} ;
 
-ADD FILE ${hiveconf:TPCHBIN}/dsdgen;
-ADD FILE ${hiveconf:TPCHBIN}/tpcds.idx;
-ADD FILE ${hiveconf:TPCHBIN}/sequenceGenerator.py;
-ADD FILE ${hiveconf:TPCHBIN}/TPCDSgen.py;
+ADD FILE ${hiveconf:TPCDSBIN}/dsdgen;
+ADD FILE ${hiveconf:TPCDSBIN}/tpcds.idx;
+ADD FILE ${hiveconf:TPCDSBIN}/sequenceGenerator.py;
+ADD FILE ${hiveconf:TPCDSBIN}/TPCDSgen.py;
 
 FROM (
     SELECT TRANSFORM(x) 
