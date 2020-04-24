@@ -90,7 +90,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     timedate >> $CLOCK_FILE
 
     # python3 parselog.py
-    # mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
+    mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
     zip -r "tpch-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
     rm log_query.zip

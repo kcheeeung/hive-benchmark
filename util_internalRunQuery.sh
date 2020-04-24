@@ -13,15 +13,16 @@ beeline -u "jdbc:hive2://`hostname`:10001/$INTERNAL_DATABASE;transportMode=http"
 RETURN_VAL=$?
 END_TIME="`date +%s`"
 
-if [[ $RETURN_VAL = 0 ]]; then
+if [[ $RETURN_VAL == 0 ]]; then
     status="SUCCESS"
+    
+    secs_elapsed="$(($END_TIME - $START_TIME))"
+    echo $INTERNAL_QID, $secs_elapsed, $status >> $INTERNAL_CSV
 else
-    status="FAIL"
+    status="FAILURE"
+    
+    echo $INTERNAL_QID, "", $status >> $INTERNAL_CSV
 fi
 
-# calculate time
-secs_elapsed="$(($END_TIME - $START_TIME))"
-# record data
-echo $INTERNAL_QID, $secs_elapsed, $status >> $INTERNAL_CSV
 # report status to terminal
 echo "query$INTERNAL_QID: $status"
