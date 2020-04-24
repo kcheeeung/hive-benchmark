@@ -37,17 +37,20 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     echo "Start data generation" >> $CLOCK_FILE
     timedate >> $CLOCK_FILE
     hdfs dfs -copyFromLocal tpch_resources /tmp
-    beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsData.hql -f TPCHDataGen.hql -hiveconf SCALE=$INPUT_SCALE -hiveconf PARTS=$INPUT_SCALE -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf TPCHBIN=`grep -A 1 "fs.defaultFS" /etc/hadoop/conf/core-site.xml | grep -o "wasb[^<]*"`/tmp/tpch_resources
+    beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsData.hql -f TPCHDataGen.hql --hiveconf SCALE=$INPUT_SCALE --hiveconf PARTS=$INPUT_SCALE --hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ --hiveconf TPCHBIN=`grep -A 1 "fs.defaultFS" /etc/hadoop/conf/core-site.xml | tail -1 | sed -e 's/.*<value>\(.*\)<\/value>.*/\1/'`/tmp/tpch_resources > /dev/null
     echo "End" >> $CLOCK_FILE
     timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
+
+    MAX_REDUCERS=2600 # ~7 years of data hortonworks
+    REDUCERS=$((test ${INPUT_SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo ${INPUT_SCALE})
 
     # table creation
     echo "Start table generation" >> $CLOCK_FILE
     timedate >> $CLOCK_FILE
     hdfs dfs -mkdir -p /HiveTPCH_$INPUT_SCALE/
     hadoop fs -chmod -R 777 /HiveTPCH_$INPUT_SCALE/
-    beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllExternalTables.hql -hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ -hiveconf DBNAME=tpch_$INPUT_SCALE
+    beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllExternalTables.hql --hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ --hiveconf DBNAME=tpch_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
     echo "End" >> $CLOCK_FILE
     timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
@@ -56,29 +59,29 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         # orc tables
         echo "Start orc table generation" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql -hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllORCTables.hql --hiveconf ORCDBNAME=tpch_orc_$INPUT_SCALE --hiveconf SOURCE=tpch_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
-        
-        echo "Start orc analysis"
+
+        echo "Start orc analysis" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_orc_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql --hiveconf DB=tpch_orc_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
     else
         # parquet tables
-        echo "Start parquet table generation"
+        echo "Start parquet table generation" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllParquetTables.hql -hiveconf PARQUETDBNAME=tpch_parquet_$INPUT_SCALE -hiveconf SOURCE=tpch_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllParquetTables.hql --hiveconf PARQUETDBNAME=tpch_parquet_$INPUT_SCALE --hiveconf SOURCE=tpch_$INPUT_SCALE
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
 
-        echo "Start parquet analysis"
+        echo "Start parquet analysis" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql -hiveconf DB=tpch_parquet_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/analyze.hql --hiveconf DB=tpch_parquet_$INPUT_SCALE
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
