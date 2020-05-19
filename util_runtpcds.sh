@@ -86,7 +86,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
             # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpcdsPAT"$ID"/query"$i"/
         else
             # report failure
-            echo $i, "", "FAILURE_FILENOTFOUND" >> "$CURR_DIR$REPORT_NAME.csv"
+            echo $i, " ", "FAILURE_FILENOTFOUND" >> "$CURR_DIR$REPORT_NAME.csv"
             echo "query$i: FAILURE"
         fi
     done
