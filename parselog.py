@@ -47,7 +47,7 @@ def write_csv(cacheHitRatios):
             writer.writerow([i + 1, cacheHitRatios[i]])
 
 os.environ["TZ"]="US/Pacific"
-time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
+time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M.%S")
 OUT_NAME = "llapio_summary" + time_id + ".csv"
 def main():
     # Range of queries. Counts the files so you don't need to know which benchmark it is
