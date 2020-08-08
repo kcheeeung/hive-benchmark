@@ -95,15 +95,15 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         fi
     done
 
-    echo "End" >> $CLOCK_FILE
-    timedate >> $CLOCK_FILE
-
     # python3 parselog.py
     # python3 parse_precisetime.py tpcds
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
     zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv" "time_precise_tpcds"*".csv"
     rm log_query.zip
+    
+    echo "End" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
 else
     echo "Scale must be greater than 1."
 fi

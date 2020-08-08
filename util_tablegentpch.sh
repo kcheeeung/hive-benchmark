@@ -47,7 +47,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
 
     # table creation
     hdfs dfs -mkdir -p /HiveTPCH_$INPUT_SCALE/
-    hdfs dfs -chmod -R 777 /HiveTPCH_$INPUT_SCALE/
+    hdfs dfs -chmod 777 /HiveTPCH_$INPUT_SCALE/
     echo "Start table generation" >> $CLOCK_FILE
     timedate >> $CLOCK_FILE
     beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpch_ddl/createAllExternalTables.hql --hiveconf LOCATION=/HiveTPCH_$INPUT_SCALE/ --hiveconf DBNAME=tpch_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
