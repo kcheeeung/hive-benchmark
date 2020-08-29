@@ -22,10 +22,9 @@ function buildGenerator() {
 }
 
 function generateData() {
-    hdfs dfs -rm -R /HiveTPCDS_$INPUT_SCALE/
-    hdfs dfs -mkdir -p /HiveTPCDS_$INPUT_SCALE/
+    hdfs dfs -rm -R /HiveTPCDS_$INPUT_SCALE
     echo "Generating data at scale factor $INPUT_SCALE."
-    (cd tpcds-gen; hadoop jar target/*.jar -d /HiveTPCDS_$INPUT_SCALE/ -s $INPUT_SCALE)
+    (cd tpcds_resources; hadoop jar target/*.jar -d /HiveTPCDS_$INPUT_SCALE -s $INPUT_SCALE)
 
     hdfs dfs -ls /HiveTPCDS_$INPUT_SCALE/ > /dev/null
     if [ $? -ne 0 ]; then
