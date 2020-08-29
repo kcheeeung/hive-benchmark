@@ -35,6 +35,7 @@ public class GenTable extends Configured implements Tool {
 
         CommandLineParser parser = new BasicParser();
         getConf().setInt("io.sort.mb", 4);
+        getConf().set("fs.permissions.umask-mode", "000");
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("s","scale", true, "scale");
         options.addOption("t","table", true, "table");
