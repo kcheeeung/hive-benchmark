@@ -4,6 +4,36 @@ function timedate() {
     TZ="America/Los_Angeles" date
 }
 
+function installLibs() {
+    # Install maven
+    which mvn
+    if [[ $? -ne 0 ]]; then
+        echo "Installing maven"
+        sudo apt install maven -y
+    else
+        echo "Maven already installed"
+    fi
+}
+
+function buildGenerator() {
+    echo "Building TPC-DS Data Generator"
+    (cd tpcds_resources; make)
+    echo "TPC-DS Data Generator built."
+}
+
+function generateData() {
+    hdfs dfs -rm -R /HiveTPCDS_$INPUT_SCALE/
+    hdfs dfs -mkdir -p /HiveTPCDS_$INPUT_SCALE/
+    echo "Generating data at scale factor $INPUT_SCALE."
+    (cd tpcds-gen; hadoop jar target/*.jar -d /HiveTPCDS_$INPUT_SCALE/ -s $INPUT_SCALE)
+
+    hdfs dfs -ls /HiveTPCDS_$INPUT_SCALE/ > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "Data generation failed, exiting."
+        exit 1
+    fi
+}
+
 if [[ "$#" -ne 2 ]]; then
     echo "Incorrect number of arguments."
     echo "Usage is as follows:"
@@ -33,31 +63,18 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     timedate >> $CLOCK_FILE
     echo "" >> $CLOCK_FILE
 
-    # Install maven
-    which mvn
-    if [[ $? -ne 0 ]]; then
-        echo "Installing maven"
-        sudo apt install maven -y
-    else
-        echo "Maven already installed"
-    fi
+    installLibs
+    buildGenerator
 
-    echo "Building TPC-DS Data Generator"
-    (cd tpcds_resources; make)
-    echo "TPC-DS Data Generator built."
+    # data generation
+    echo "Start data generation" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+    generateData
+    echo "End" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+    echo "" >> $CLOCK_FILE
 
 
-
-
-
-    # # data generation
-    # echo "Start data generation" >> $CLOCK_FILE
-    # timedate >> $CLOCK_FILE
-    # hdfs dfs -copyFromLocal tpcds_resources /tmp
-    # beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsData.hql -f TPCDSDataGen.hql --hiveconf SCALE=$INPUT_SCALE --hiveconf PARTS=$INPUT_SCALE --hiveconf LOCATION=/HiveTPCDS_$INPUT_SCALE/ --hiveconf TPCDSBIN=`grep -A 1 "fs.defaultFS" /etc/hadoop/conf/core-site.xml | tail -1 | sed -e 's/.*<value>\(.*\)<\/value>.*/\1/'`/tmp/tpcds_resources > /dev/null
-    # echo "End" >> $CLOCK_FILE
-    # timedate >> $CLOCK_FILE
-    # echo "" >> $CLOCK_FILE
 
     # MAX_REDUCERS=2600 # ~7 years of data hortonworks
     # REDUCERS=$((test ${INPUT_SCALE} -gt ${MAX_REDUCERS} && echo ${MAX_REDUCERS}) || echo ${INPUT_SCALE})
