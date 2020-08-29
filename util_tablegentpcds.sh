@@ -6,7 +6,7 @@ function timedate() {
 
 function installLibs() {
     # Install maven
-    which maven
+    which mvn
     if [[ $? -ne 0 ]]; then
         echo "Installing maven"
         sudo apt install maven -y
