@@ -43,7 +43,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     fi
 
     echo "Building TPC-DS Data Generator"
-    (cd tpcds-gen; make)
+    (cd tpcds_resources; make)
     echo "TPC-DS Data Generator built."
 
 
