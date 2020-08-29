@@ -95,7 +95,7 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
 
         echo "Start orc analysis" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsTable.hql -f tpcds_dll/analyze.hql --hiveconf DB=tpcds_orc_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpcds_dll/analyze.hql --hiveconf DB=tpcds_orc_$INPUT_SCALE
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
@@ -103,14 +103,14 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         # parquet tables
         echo "Start parquet table generation" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsTable.hql -f tpcds_dll/createAllParquetTables.hql --hiveconf PARQUETDBNAME=tpcds_parquet_$INPUT_SCALE --hiveconf SOURCE=tpcds_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsTable.hql -f tpcds_dll/createAllParquetTables.hql --hiveconf PARQUETDBNAME=tpcds_parquet_$INPUT_SCALE --hiveconf SOURCE=tpcds_$INPUT_SCALE --hiveconf REDUCERS=$REDUCERS
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
 
         echo "Start parquet analysis" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settingsTable.hql -f tpcds_dll/analyze.hql --hiveconf DB=tpcds_parquet_$INPUT_SCALE
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -i settings.hql -f tpcds_dll/analyze.hql --hiveconf DB=tpcds_parquet_$INPUT_SCALE
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
