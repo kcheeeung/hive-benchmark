@@ -8,8 +8,15 @@ function installLibs() {
     # Install maven
     which mvn
     if [[ $? -ne 0 ]]; then
-        echo "Installing maven"
-        sudo apt install maven -y
+        curl -O https://downloads.apache.org/maven/maven-3/3.0.5/binaries/apache-maven-3.0.5-bin.tar.gz 2> /dev/null
+        if [ $? -ne 0 ]; then
+            echo "Failed to download Maven, check Internet connectivity and try again."
+            exit 1
+        fi
+        tar -zxf apache-maven-3.0.5-bin.tar.gz > /dev/null
+        CWD=$(pwd)
+        export MAVEN_HOME="$CWD/apache-maven-3.0.5"
+        export PATH=$PATH:$MAVEN_HOME/bin
     else
         echo "Maven already installed"
     fi
