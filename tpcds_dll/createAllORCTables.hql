@@ -7,11 +7,11 @@ drop table if exists inventory;
 
 create table inventory
 (
-    inv_item_sk          bigint,
-    inv_warehouse_sk        bigint,
+    inv_item_sk             int,
+    inv_warehouse_sk        int,
     inv_quantity_on_hand    int
 )
-partitioned by (inv_date_sk bigint)
+partitioned by (inv_date_sk int)
 stored as ORC;
 
 insert overwrite table inventory partition (inv_date_sk)
@@ -27,34 +27,34 @@ drop table if exists catalog_returns;
 
 create table catalog_returns
 (
-    cr_returned_time_sk       bigint,
-    cr_item_sk                bigint,
-    cr_refunded_customer_sk   bigint,
-    cr_refunded_cdemo_sk      bigint,
-    cr_refunded_hdemo_sk      bigint,
-    cr_refunded_addr_sk       bigint,
-    cr_returning_customer_sk  bigint,
-    cr_returning_cdemo_sk     bigint,
-    cr_returning_hdemo_sk     bigint,
-    cr_returning_addr_sk      bigint,
-    cr_call_center_sk         bigint,
-    cr_catalog_page_sk        bigint,
-    cr_ship_mode_sk           bigint,
-    cr_warehouse_sk           bigint,
-    cr_reason_sk              bigint,
-    cr_order_number           bigint,
+    cr_returned_time_sk       int,
+    cr_item_sk                int,
+    cr_refunded_customer_sk   int,
+    cr_refunded_cdemo_sk      int,
+    cr_refunded_hdemo_sk      int,
+    cr_refunded_addr_sk       int,
+    cr_returning_customer_sk  int,
+    cr_returning_cdemo_sk     int,
+    cr_returning_hdemo_sk     int,
+    cr_returning_addr_sk      int,
+    cr_call_center_sk         int,
+    cr_catalog_page_sk        int,
+    cr_ship_mode_sk           int,
+    cr_warehouse_sk           int,
+    cr_reason_sk              int,
+    cr_order_number           int,
     cr_return_quantity        int,
-    cr_return_amount          double,
-    cr_return_tax             double,
-    cr_return_amt_inc_tax     double,
-    cr_fee                    double,
-    cr_return_ship_cost       double,
-    cr_refunded_cash          double,
-    cr_reversed_charge        double,
-    cr_store_credit           double,
-    cr_net_loss               double
+    cr_return_amount          decimal(7,2),
+    cr_return_tax             decimal(7,2),
+    cr_return_amt_inc_tax     decimal(7,2),
+    cr_fee                    decimal(7,2),
+    cr_return_ship_cost       decimal(7,2),
+    cr_refunded_cash          decimal(7,2),
+    cr_reversed_charge        decimal(7,2),
+    cr_store_credit           decimal(7,2),
+    cr_net_loss               decimal(7,2)
 )
-partitioned by (cr_returned_date_sk bigint)
+partitioned by (cr_returned_date_sk int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.catalog_returns cr
@@ -126,41 +126,41 @@ drop table if exists catalog_sales;
 
 create table catalog_sales
 (
-    cs_sold_time_sk           bigint,
-    cs_ship_date_sk           bigint,
-    cs_bill_customer_sk       bigint,
-    cs_bill_cdemo_sk          bigint,
-    cs_bill_hdemo_sk          bigint,
-    cs_bill_addr_sk           bigint,
-    cs_ship_customer_sk       bigint,
-    cs_ship_cdemo_sk          bigint,
-    cs_ship_hdemo_sk          bigint,
-    cs_ship_addr_sk           bigint,
-    cs_call_center_sk         bigint,
-    cs_catalog_page_sk        bigint,
-    cs_ship_mode_sk           bigint,
-    cs_warehouse_sk           bigint,
-    cs_item_sk                bigint,
-    cs_promo_sk               bigint,
-    cs_order_number           bigint,
+    cs_sold_time_sk           int,
+    cs_ship_date_sk           int,
+    cs_bill_customer_sk       int,
+    cs_bill_cdemo_sk          int,
+    cs_bill_hdemo_sk          int,
+    cs_bill_addr_sk           int,
+    cs_ship_customer_sk       int,
+    cs_ship_cdemo_sk          int,
+    cs_ship_hdemo_sk          int,
+    cs_ship_addr_sk           int,
+    cs_call_center_sk         int,
+    cs_catalog_page_sk        int,
+    cs_ship_mode_sk           int,
+    cs_warehouse_sk           int,
+    cs_item_sk                int,
+    cs_promo_sk               int,
+    cs_order_number           int,
     cs_quantity               int,
-    cs_wholesale_cost         double,
-    cs_list_price             double,
-    cs_sales_price            double,
-    cs_ext_discount_amt       double,
-    cs_ext_sales_price        double,
-    cs_ext_wholesale_cost     double,
-    cs_ext_list_price         double,
-    cs_ext_tax                double,
-    cs_coupon_amt             double,
-    cs_ext_ship_cost          double,
-    cs_net_paid               double,
-    cs_net_paid_inc_tax       double,
-    cs_net_paid_inc_ship      double,
-    cs_net_paid_inc_ship_tax  double,
-    cs_net_profit             double
+    cs_wholesale_cost         decimal(7,2),
+    cs_list_price             decimal(7,2),
+    cs_sales_price            decimal(7,2),
+    cs_ext_discount_amt       decimal(7,2),
+    cs_ext_sales_price        decimal(7,2),
+    cs_ext_wholesale_cost     decimal(7,2),
+    cs_ext_list_price         decimal(7,2),
+    cs_ext_tax                decimal(7,2),
+    cs_coupon_amt             decimal(7,2),
+    cs_ext_ship_cost          decimal(7,2),
+    cs_net_paid               decimal(7,2),
+    cs_net_paid_inc_tax       decimal(7,2),
+    cs_net_paid_inc_ship      decimal(7,2),
+    cs_net_paid_inc_ship_tax  decimal(7,2),
+    cs_net_profit             decimal(7,2)
 )
-partitioned by (cs_sold_date_sk bigint)
+partitioned by (cs_sold_date_sk int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.catalog_sales cs
@@ -245,27 +245,27 @@ drop table if exists store_returns;
 
 create table store_returns
 (
-    sr_return_time_sk         bigint,
-    sr_item_sk                bigint,
-    sr_customer_sk            bigint,
-    sr_cdemo_sk               bigint,
-    sr_hdemo_sk               bigint,
-    sr_addr_sk                bigint,
-    sr_store_sk               bigint,
-    sr_reason_sk              bigint,
-    sr_ticket_number          bigint,
+    sr_return_time_sk         int,
+    sr_item_sk                int,
+    sr_customer_sk            int,
+    sr_cdemo_sk               int,
+    sr_hdemo_sk               int,
+    sr_addr_sk                int,
+    sr_store_sk               int,
+    sr_reason_sk              int,
+    sr_ticket_number          int,
     sr_return_quantity        int,
-    sr_return_amt             double,
-    sr_return_tax             double,
-    sr_return_amt_inc_tax     double,
-    sr_fee                    double,
-    sr_return_ship_cost       double,
-    sr_refunded_cash          double,
-    sr_reversed_charge        double,
-    sr_store_credit           double,
-    sr_net_loss               double
+    sr_return_amt             decimal(7,2),
+    sr_return_tax             decimal(7,2),
+    sr_return_amt_inc_tax     decimal(7,2),
+    sr_fee                    decimal(7,2),
+    sr_return_ship_cost       decimal(7,2),
+    sr_refunded_cash          decimal(7,2),
+    sr_reversed_charge        decimal(7,2),
+    sr_store_credit           decimal(7,2),
+    sr_net_loss               decimal(7,2)
 )
-partitioned by (sr_returned_date_sk bigint)
+partitioned by (sr_returned_date_sk int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.store_returns sr
@@ -322,30 +322,30 @@ drop table if exists store_sales;
 
 create table store_sales
 (
-    ss_sold_time_sk           bigint,
-    ss_item_sk                bigint,
-    ss_customer_sk            bigint,
-    ss_cdemo_sk               bigint,
-    ss_hdemo_sk               bigint,
-    ss_addr_sk                bigint,
-    ss_store_sk               bigint,
-    ss_promo_sk               bigint,
-    ss_ticket_number          bigint,
+    ss_sold_time_sk           int,
+    ss_item_sk                int,
+    ss_customer_sk            int,
+    ss_cdemo_sk               int,
+    ss_hdemo_sk               int,
+    ss_addr_sk                int,
+    ss_store_sk               int,
+    ss_promo_sk               int,
+    ss_ticket_number          int,
     ss_quantity               int,
-    ss_wholesale_cost         double,
-    ss_list_price             double,
-    ss_sales_price            double,
-    ss_ext_discount_amt       double,
-    ss_ext_sales_price        double,
-    ss_ext_wholesale_cost     double,
-    ss_ext_list_price         double,
-    ss_ext_tax                double,
-    ss_coupon_amt             double,
-    ss_net_paid               double,
-    ss_net_paid_inc_tax       double,
-    ss_net_profit             double
+    ss_wholesale_cost         decimal(7,2),
+    ss_list_price             decimal(7,2),
+    ss_sales_price            decimal(7,2),
+    ss_ext_discount_amt       decimal(7,2),
+    ss_ext_sales_price        decimal(7,2),
+    ss_ext_wholesale_cost     decimal(7,2),
+    ss_ext_list_price         decimal(7,2),
+    ss_ext_tax                decimal(7,2),
+    ss_coupon_amt             decimal(7,2),
+    ss_net_paid               decimal(7,2),
+    ss_net_paid_inc_tax       decimal(7,2),
+    ss_net_profit             decimal(7,2)
 )
-partitioned by (ss_sold_date_sk bigint)
+partitioned by (ss_sold_date_sk int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.store_sales ss
@@ -408,31 +408,31 @@ drop table if exists web_returns;
 
 create table web_returns
 (
-    wr_returned_time_sk       bigint,
-    wr_item_sk                bigint,
-    wr_refunded_customer_sk   bigint,
-    wr_refunded_cdemo_sk      bigint,
-    wr_refunded_hdemo_sk      bigint,
-    wr_refunded_addr_sk       bigint,
-    wr_returning_customer_sk  bigint,
-    wr_returning_cdemo_sk     bigint,
-    wr_returning_hdemo_sk     bigint,
-    wr_returning_addr_sk      bigint,
-    wr_web_page_sk            bigint,
-    wr_reason_sk              bigint,
-    wr_order_number           bigint,
+    wr_returned_time_sk       int,
+    wr_item_sk                int,
+    wr_refunded_customer_sk   int,
+    wr_refunded_cdemo_sk      int,
+    wr_refunded_hdemo_sk      int,
+    wr_refunded_addr_sk       int,
+    wr_returning_customer_sk  int,
+    wr_returning_cdemo_sk     int,
+    wr_returning_hdemo_sk     int,
+    wr_returning_addr_sk      int,
+    wr_web_page_sk            int,
+    wr_reason_sk              int,
+    wr_order_number           int,
     wr_return_quantity        int,
-    wr_return_amt             double,
-    wr_return_tax             double,
-    wr_return_amt_inc_tax     double,
-    wr_fee                    double,
-    wr_return_ship_cost       double,
-    wr_refunded_cash          double,
-    wr_reversed_charge        double,
-    wr_account_credit         double,
-    wr_net_loss               double
+    wr_return_amt             decimal(7,2),
+    wr_return_tax             decimal(7,2),
+    wr_return_amt_inc_tax     decimal(7,2),
+    wr_fee                    decimal(7,2),
+    wr_return_ship_cost       decimal(7,2),
+    wr_refunded_cash          decimal(7,2),
+    wr_reversed_charge        decimal(7,2),
+    wr_account_credit         decimal(7,2),
+    wr_net_loss               decimal(7,2)
 )
-partitioned by (wr_returned_date_sk       bigint)
+partitioned by (wr_returned_date_sk       int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.web_returns wr
@@ -497,41 +497,41 @@ drop table if exists web_sales;
 
 create table web_sales
 (
-    ws_sold_time_sk           bigint,
-    ws_ship_date_sk           bigint,
-    ws_item_sk                bigint,
-    ws_bill_customer_sk       bigint,
-    ws_bill_cdemo_sk          bigint,
-    ws_bill_hdemo_sk          bigint,
-    ws_bill_addr_sk           bigint,
-    ws_ship_customer_sk       bigint,
-    ws_ship_cdemo_sk          bigint,
-    ws_ship_hdemo_sk          bigint,
-    ws_ship_addr_sk           bigint,
-    ws_web_page_sk            bigint,
-    ws_web_site_sk            bigint,
-    ws_ship_mode_sk           bigint,
-    ws_warehouse_sk           bigint,
-    ws_promo_sk               bigint,
-    ws_order_number           bigint,
+    ws_sold_time_sk           int,
+    ws_ship_date_sk           int,
+    ws_item_sk                int,
+    ws_bill_customer_sk       int,
+    ws_bill_cdemo_sk          int,
+    ws_bill_hdemo_sk          int,
+    ws_bill_addr_sk           int,
+    ws_ship_customer_sk       int,
+    ws_ship_cdemo_sk          int,
+    ws_ship_hdemo_sk          int,
+    ws_ship_addr_sk           int,
+    ws_web_page_sk            int,
+    ws_web_site_sk            int,
+    ws_ship_mode_sk           int,
+    ws_warehouse_sk           int,
+    ws_promo_sk               int,
+    ws_order_number           int,
     ws_quantity               int,
-    ws_wholesale_cost         double,
-    ws_list_price             double,
-    ws_sales_price            double,
-    ws_ext_discount_amt       double,
-    ws_ext_sales_price        double,
-    ws_ext_wholesale_cost     double,
-    ws_ext_list_price         double,
-    ws_ext_tax                double,
-    ws_coupon_amt             double,
-    ws_ext_ship_cost          double,
-    ws_net_paid               double,
-    ws_net_paid_inc_tax       double,
-    ws_net_paid_inc_ship      double,
-    ws_net_paid_inc_ship_tax  double,
-    ws_net_profit             double
+    ws_wholesale_cost         decimal(7,2),
+    ws_list_price             decimal(7,2),
+    ws_sales_price            decimal(7,2),
+    ws_ext_discount_amt       decimal(7,2),
+    ws_ext_sales_price        decimal(7,2),
+    ws_ext_wholesale_cost     decimal(7,2),
+    ws_ext_list_price         decimal(7,2),
+    ws_ext_tax                decimal(7,2),
+    ws_coupon_amt             decimal(7,2),
+    ws_ext_ship_cost          decimal(7,2),
+    ws_net_paid               decimal(7,2),
+    ws_net_paid_inc_tax       decimal(7,2),
+    ws_net_paid_inc_ship      decimal(7,2),
+    ws_net_paid_inc_ship_tax  decimal(7,2),
+    ws_net_profit             decimal(7,2)
 )
-partitioned by (ws_sold_date_sk           bigint)
+partitioned by (ws_sold_date_sk           int)
 stored as ORC;
 
 from ${hiveconf:SOURCE}.web_sales ws
