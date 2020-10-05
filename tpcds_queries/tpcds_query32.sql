@@ -1,5 +1,5 @@
 -- start query 32 in stream 0 using template query32.tpl
-select  sum(cs_ext_discount_amt)  as "excess discount amount" 
+select  sum(cs_ext_discount_amt)  as `excess discount amount`
 from 
    catalog_sales 
    ,item 
