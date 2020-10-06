@@ -5,21 +5,9 @@ USE ${hiveconf:ORCDBNAME};
 
 drop table if exists inventory;
 create table inventory
-(
-    inv_item_sk             int,
-    inv_warehouse_sk        int,
-    inv_quantity_on_hand    int
-)
-partitioned by (inv_date_sk int)
-stored as ORC;
-
-insert overwrite table inventory partition (inv_date_sk)
-select
-    i.inv_item_sk,
-    i.inv_warehouse_sk,
-    i.inv_quantity_on_hand,
-    i.inv_date_sk
-  from ${hiveconf:SOURCE}.inventory i;
+stored as ORC
+as select * from ${hiveconf:SOURCE}.inventory
+CLUSTER BY inv_date_sk;
 
 drop table if exists catalog_returns;
 create table catalog_returns
@@ -617,12 +605,14 @@ as select * from ${hiveconf:SOURCE}.catalog_page;
 drop table if exists customer;
 create table customer
 stored as ORC
-as select * from ${hiveconf:SOURCE}.customer;
+as select * from ${hiveconf:SOURCE}.customer
+CLUSTER BY c_customer_sk;
 
 drop table if exists customer_address;
 create table customer_address
 stored as ORC
-as select * from ${hiveconf:SOURCE}.customer_address;
+as select * from ${hiveconf:SOURCE}.customer_address
+CLUSTER BY ca_address_sk;
 
 drop table if exists customer_demographics;
 create table customer_demographics
@@ -647,7 +637,8 @@ as select * from ${hiveconf:SOURCE}.income_band;
 drop table if exists item;
 create table item
 stored as ORC
-as select * from ${hiveconf:SOURCE}.item;
+as select * from ${hiveconf:SOURCE}.item
+CLUSTER BY i_item_sk;
 
 drop table if exists promotion;
 create table promotion
@@ -667,7 +658,8 @@ as select * from ${hiveconf:SOURCE}.ship_mode;
 drop table if exists store;
 create table store
 stored as ORC
-as select * from ${hiveconf:SOURCE}.store;
+as select * from ${hiveconf:SOURCE}.store
+CLUSTER BY s_store_sk;
 
 drop table if exists time_dim;
 create table time_dim

@@ -38,7 +38,8 @@ create external table call_center(
     cc_tax_percentage         decimal(5,2)
 )
 row format delimited fields terminated by '|'
-location '${hiveconf:LOCATION}/call_center';
+location '${hiveconf:LOCATION}/call_center'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists catalog_page;
 create external table catalog_page(
@@ -53,7 +54,8 @@ create external table catalog_page(
     cp_type                   varchar(100)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/catalog_page';
+location '${hiveconf:LOCATION}/catalog_page'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists catalog_returns;
 create external table catalog_returns
@@ -87,7 +89,8 @@ create external table catalog_returns
     cr_net_loss               decimal(7,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/catalog_returns';
+location '${hiveconf:LOCATION}/catalog_returns'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists catalog_sales;
 create external table catalog_sales
@@ -128,7 +131,8 @@ create external table catalog_sales
     cs_net_profit             decimal(7,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/catalog_sales';
+location '${hiveconf:LOCATION}/catalog_sales'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists customer_address;
 create external table customer_address
@@ -148,7 +152,8 @@ create external table customer_address
     ca_location_type          char(20)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/customer_address';
+location '${hiveconf:LOCATION}/customer_address'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists customer_demographics;
 create external table customer_demographics
@@ -164,7 +169,8 @@ create external table customer_demographics
     cd_dep_college_count      integer
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/customer_demographics';
+location '${hiveconf:LOCATION}/customer_demographics'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists customer;
 create external table customer
@@ -189,7 +195,8 @@ create external table customer
     c_last_review_date        char(10)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/customer';
+location '${hiveconf:LOCATION}/customer'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists date_dim;
 create external table date_dim
@@ -224,7 +231,8 @@ create external table date_dim
     d_current_year            char(1)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/date_dim';
+location '${hiveconf:LOCATION}/date_dim'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists household_demographics;
 create external table household_demographics
@@ -236,7 +244,8 @@ create external table household_demographics
     hd_vehicle_count          integer
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/household_demographics';
+location '${hiveconf:LOCATION}/household_demographics'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists income_band;
 create external table income_band(
@@ -245,7 +254,8 @@ create external table income_band(
     ib_upper_bound            integer
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/income_band';
+location '${hiveconf:LOCATION}/income_band'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists inventory;
 create external table inventory
@@ -256,7 +266,8 @@ create external table inventory
     inv_quantity_on_hand      integer
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/inventory';
+location '${hiveconf:LOCATION}/inventory'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists item;
 create external table item
@@ -285,7 +296,8 @@ create external table item
     i_product_name            char(50)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/item';
+location '${hiveconf:LOCATION}/item'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists promotion;
 create external table promotion
@@ -311,7 +323,8 @@ create external table promotion
     p_discount_active         char(1)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/promotion';
+location '${hiveconf:LOCATION}/promotion'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists reason;
 create external table reason(
@@ -320,7 +333,8 @@ create external table reason(
     r_reason_desc             char(100)           
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/reason';
+location '${hiveconf:LOCATION}/reason'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists ship_mode;
 create external table ship_mode(
@@ -332,7 +346,8 @@ create external table ship_mode(
     sm_contract               char(20)                    
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/ship_mode';
+location '${hiveconf:LOCATION}/ship_mode'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists store_returns;
 create external table store_returns
@@ -359,7 +374,8 @@ create external table store_returns
     sr_net_loss               decimal(7,2)           
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/store_returns';
+location '${hiveconf:LOCATION}/store_returns'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists store_sales;
 create external table store_sales
@@ -389,7 +405,8 @@ create external table store_sales
     ss_net_profit             decimal(7,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/store_sales';
+location '${hiveconf:LOCATION}/store_sales'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists store;
 create external table store
@@ -425,7 +442,8 @@ create external table store
     s_tax_precentage          decimal(5,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/store';
+location '${hiveconf:LOCATION}/store'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists time_dim;
 create external table time_dim
@@ -442,7 +460,8 @@ create external table time_dim
     t_meal_time               char(20)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/time_dim';
+location '${hiveconf:LOCATION}/time_dim'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists warehouse;
 create external table warehouse(
@@ -462,7 +481,8 @@ create external table warehouse(
     w_gmt_offset              decimal(5,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/warehouse';
+location '${hiveconf:LOCATION}/warehouse'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists web_page;
 create external table web_page(
@@ -482,7 +502,8 @@ create external table web_page(
     wp_max_ad_count           integer
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/web_page';
+location '${hiveconf:LOCATION}/web_page'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists web_returns;
 create external table web_returns
@@ -513,7 +534,8 @@ create external table web_returns
     wr_net_loss               decimal(7,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/web_returns';
+location '${hiveconf:LOCATION}/web_returns'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists web_sales;
 create external table web_sales
@@ -554,7 +576,8 @@ create external table web_sales
     ws_net_profit             decimal(7,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/web_sales';
+location '${hiveconf:LOCATION}/web_sales'
+tblproperties ('serialization.null.format'='');
 
 drop table if exists web_site;
 create external table web_site
@@ -587,4 +610,5 @@ create external table web_site
     web_tax_percentage        decimal(5,2)
 )
 row format delimited fields terminated by '|' 
-location '${hiveconf:LOCATION}/web_site';
+location '${hiveconf:LOCATION}/web_site'
+tblproperties ('serialization.null.format'='');
