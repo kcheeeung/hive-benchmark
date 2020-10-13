@@ -192,7 +192,7 @@ create external table customer
     c_birth_country           varchar(20)                   ,
     c_login                   char(13)                      ,
     c_email_address           char(50)                      ,
-    c_last_review_date        char(10)
+    c_last_review_date_sk     char(10)
 )
 row format delimited fields terminated by '|' 
 location '${hiveconf:LOCATION}/customer'

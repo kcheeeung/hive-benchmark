@@ -71,9 +71,9 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
 
-        echo "Load constraints"
+        echo "Load constraints" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
-        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -f tpcds_dll/constraints.hql --hiveconf DB=tpcds_orc_$INPUT_SCALE 
+        beeline -u "jdbc:hive2://`hostname -f`:10001/;transportMode=http" -f tpcds_dll/constraints.hql --hivevar DB=tpcds_orc_$INPUT_SCALE 
         echo "End" >> $CLOCK_FILE
         timedate >> $CLOCK_FILE
         echo "" >> $CLOCK_FILE
