@@ -595,12 +595,14 @@ select
 drop table if exists call_center;
 create table call_center
 stored as ORC
-as select * from ${hiveconf:SOURCE}.call_center;
+as select * from ${hiveconf:SOURCE}.call_center
+CLUSTER BY cc_call_center_sk;
 
 drop table if exists catalog_page;
 create table catalog_page
 stored as ORC
-as select * from ${hiveconf:SOURCE}.catalog_page;
+as select * from ${hiveconf:SOURCE}.catalog_page
+CLUSTER BY cp_catalog_page_sk;
 
 drop table if exists customer;
 create table customer
@@ -617,22 +619,26 @@ CLUSTER BY ca_address_sk;
 drop table if exists customer_demographics;
 create table customer_demographics
 stored as ORC
-as select * from ${hiveconf:SOURCE}.customer_demographics;
+as select * from ${hiveconf:SOURCE}.customer_demographics
+CLUSTER BY cd_demo_sk;
 
 drop table if exists date_dim;
 create table date_dim
 stored as ORC
-as select * from ${hiveconf:SOURCE}.date_dim;
+as select * from ${hiveconf:SOURCE}.date_dim
+CLUSTER BY d_date_sk;
 
 drop table if exists household_demographics;
 create table household_demographics
 stored as ORC
-as select * from ${hiveconf:SOURCE}.household_demographics;
+as select * from ${hiveconf:SOURCE}.household_demographics
+CLUSTER BY hd_demo_sk;
 
 drop table if exists income_band;
 create table income_band
 stored as ORC
-as select * from ${hiveconf:SOURCE}.income_band;
+as select * from ${hiveconf:SOURCE}.income_band
+CLUSTER BY ib_income_band_sk;
 
 drop table if exists item;
 create table item
@@ -643,17 +649,20 @@ CLUSTER BY i_item_sk;
 drop table if exists promotion;
 create table promotion
 stored as ORC
-as select * from ${hiveconf:SOURCE}.promotion;
+as select * from ${hiveconf:SOURCE}.promotion
+CLUSTER BY p_promo_sk;
 
 drop table if exists reason;
 create table reason
 stored as ORC
-as select * from ${hiveconf:SOURCE}.reason;
+as select * from ${hiveconf:SOURCE}.reason
+CLUSTER BY r_reason_sk;
 
 drop table if exists ship_mode;
 create table ship_mode
 stored as ORC
-as select * from ${hiveconf:SOURCE}.ship_mode;
+as select * from ${hiveconf:SOURCE}.ship_mode
+CLUSTER BY sm_ship_mode_sk;
 
 drop table if exists store;
 create table store
@@ -664,19 +673,23 @@ CLUSTER BY s_store_sk;
 drop table if exists time_dim;
 create table time_dim
 stored as ORC
-as select * from ${hiveconf:SOURCE}.time_dim;
+as select * from ${hiveconf:SOURCE}.time_dim
+CLUSTER BY t_time_sk;
 
 drop table if exists warehouse;
 create table warehouse
 stored as ORC
-as select * from ${hiveconf:SOURCE}.warehouse;
+as select * from ${hiveconf:SOURCE}.warehouse
+CLUSTER BY w_warehouse_sk;
 
 drop table if exists web_page;
 create table web_page
 stored as ORC
-as select * from ${hiveconf:SOURCE}.web_page;
+as select * from ${hiveconf:SOURCE}.web_page
+CLUSTER BY wp_web_page_sk;
 
 drop table if exists web_site;
 create table web_site
 stored as ORC
-as select * from ${hiveconf:SOURCE}.web_site;
+as select * from ${hiveconf:SOURCE}.web_site
+CLUSTER BY web_site_sk;
