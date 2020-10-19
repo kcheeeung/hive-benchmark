@@ -19,6 +19,7 @@ alter table household_demographics add constraint ${DB}_pk_hd primary key (hd_de
 alter table web_page add constraint ${DB}_pk_wp primary key (wp_web_page_sk) disable novalidate rely;
 alter table promotion add constraint ${DB}_pk_p primary key (p_promo_sk) disable novalidate rely;
 alter table catalog_page add constraint ${DB}_pk_cp primary key (cp_catalog_page_sk) disable novalidate rely;
+-- primary key: partition_col case
 alter table inventory add constraint ${DB}_pk_in primary key (inv_date_sk, inv_item_sk, inv_warehouse_sk) disable novalidate rely;
 alter table catalog_returns add constraint ${DB}_pk_cr primary key (cr_item_sk, cr_order_number) disable novalidate rely;
 alter table web_returns add constraint ${DB}_pk_wr primary key (wr_item_sk, wr_order_number) disable novalidate rely;
@@ -214,7 +215,7 @@ alter table customer add constraint ${DB}_c_hd foreign key  (c_current_hdemo_sk)
 alter table customer add constraint ${DB}_c_a foreign key  (c_current_addr_sk) references customer_address (ca_address_sk) disable novalidate rely;
 alter table customer add constraint ${DB}_c_fsd2 foreign key  (c_first_shipto_date_sk) references date_dim (d_date_sk) disable novalidate rely;
 alter table customer add constraint ${DB}_c_fsd foreign key  (c_first_sales_date_sk) references date_dim (d_date_sk) disable novalidate rely;
-alter table customer add constraint ${DB}_c_lrd foreign key  (c_last_review_date_sk) references date_dim (d_date_sk) disable novalidate rely;
+alter table customer add constraint ${DB}_c_lrd foreign key  (c_last_review_date_sk) references date_dim (d_date_sk) disable novalidate rely; -- check
 
 alter table household_demographics add constraint ${DB}_hd_ib foreign key  (hd_income_band_sk) references income_band (ib_income_band_sk) disable novalidate rely;
 
