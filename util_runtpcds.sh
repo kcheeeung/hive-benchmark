@@ -2,52 +2,40 @@
 
 function timedate() {
     TZ="America/Los_Angeles" date
+    echo ""
 }
 
-ID=`TZ="America/Los_Angeles" date +"%m.%d.%Y-%H.%M.%S"`
-
-if [[ "$#" -ne 2 ]]; then
-    echo "Incorrect number of arguments."
-    echo "Usage is as follows:"
-    echo "sh util_runtpcds.sh SCALE FORMAT"
+function usageExit() {
+    echo "Usage: sh util_runtpcds.sh SCALE FORMAT"
+    echo "SCALE must be greater than 1"
+    echo "FORMAT must be either 'orc' | 'parquet'"
     exit 1
-fi
+}
 
-if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
-    if [[ "$2" == "orc" || "$2" == "parquet" ]]; then
-        echo "File format ok"
-    else
-        echo "Invalid. Supported formats are:"
-        echo "orc"
-        echo "parquet"
-        exit 1
-    fi
+function setupRun() {
+    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S"`
 
-    # query file name
-    QUERY_BASE_NAME="tpcds_queries/tpcds_query"
+    # --- QUERY FILE NAME ---
+    QUERY_BASE_NAME="sample-queries-tpcds/query"
     QUERY_FILE_EXT=".sql"
-    # settings file location
-    SETTINGS_PATH="settings.hql"
+    
+    # --- SETTINGS ---
+    SETTINGS_PATH="settings.sql"
 
-    # scale ~GB
-    SCALE="$1"
-    # report name
+    # --- REPORT NAME ---
     REPORT_NAME="time_elapsed_tpcds"
-    # database name
-    if [[ "$2" == "orc" ]]; then
-        DATABASE="tpcds_orc_"$SCALE
-    else
-        DATABASE="tpcds_parquet_"$SCALE
-    fi
-    # hostname
-    HOSTNAME=`hostname -f`
-    # Clock file
+
+    # --- DATABASE ---
+    DATABASE="tpcds_bin_partitioned_${FORMAT}_${SCALE}"
+
+    # --- CLOCK ---
     CLOCK_FILE="aaa_clocktime.txt"
-    rm $CLOCK_FILE
-    echo "Old clock removed"
+
+    if [[ -f $CLOCK_FILE ]]; then
+        rm $CLOCK_FILE
+        echo "Old clock removed"
+    fi
     echo "Created new clock"
-    echo "Run queries for TPC-DS at scale $SCALE" > $CLOCK_FILE
-    timedate >> $CLOCK_FILE
 
     # generate time report
     rm $REPORT_NAME*".csv"
@@ -59,51 +47,71 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     rm "llapio_summary"*".csv"
     echo "Old llapio_summary*.csv removed"
 
-    # remove old time_precise_
-    rm "time_precise_"*".csv"
-    echo "Old time_precise_*.csv removed"
-
     # clear and make new log directory
-    rm -r log_query/
-    echo "Old logs removed"
+    if [[ -d log_query/ ]]; then
+        rm -r log_query/
+        echo "Old logs removed"
+    fi
     mkdir log_query/
     echo "Log folder generated"
 
     # make executable
-    chmod +x *".sh"
+    chmod +x util_internalGetPAT.sh
+    chmod +x util_internalRunQuery.sh
     chmod -R +x PAT/
 
     # absolute path
     CURR_DIR="`pwd`/"
+}
 
+function runBenchmark() {
+    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+    
     # range of queries
     START=1
     END=99
-    for (( i = $START; i <= $END; i++ )); do
-        query_path=($QUERY_BASE_NAME$i$QUERY_FILE_EXT)
-        LOG_PATH="log_query/logquery$i.txt"
+    REPEAT=1
+    for (( QUERY_NUM = $START; QUERY_NUM <= $END; QUERY_NUM++ )); do
+        for (( j = 0; j < $REPEAT; j++ )); do
+            query_path=(${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT})
+            LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
-        if [[ -f $query_path ]]; then
-            ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
+            ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
 
-            # See util_internalGetPAT
-            # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpcdsPAT"$ID"/query"$i"/
-        else
-            # report failure
-            echo $i, " ", "FAILURE_FILENOTFOUND" >> "$CURR_DIR$REPORT_NAME.csv"
-            echo "query$i: FAILURE"
-        fi
+            # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv" tpcdsPAT"$ID"/query"$i"/
+        done
     done
 
-    # python3 parselog.py
-    # python3 parse_precisetime.py tpcds
+    echo "Finished" >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+}
+
+function generateZipReport() {
+    python3 parselog.py
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv" "time_precise_tpcds"*".csv"
-    rm log_query.zip
-    
-    echo "End" >> $CLOCK_FILE
-    timedate >> $CLOCK_FILE
-else
-    echo "Scale must be greater than 1."
+    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
+    rm log_query.zip 
+}
+
+# --- SCRIPT START ---
+SCALE=$1
+FORMAT=$2
+
+if [[ "X$SCALE" == "X" || $SCALE -eq 1 ]]; then
+    usageExit
 fi
+if ! [[ "$SCALE" =~ ^[0-9]+$ ]]; then
+    echo "'$SCALE' is not a number!"
+    usageExit
+fi
+if [[ "$FORMAT" != "orc" && "$FORMAT" != "parquet" ]]; then
+    usageExit
+fi
+
+setupRun
+
+runBenchmark
+
+generateZipReport
