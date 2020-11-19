@@ -28,10 +28,6 @@ Build the benchmark you want to use (do all the prerequisites)
 ## 2. Generate the tables
 Decide how much data you want. `SCALE` approximately is about # ~GB. Supported `FORMAT` includes: `orc` and `parquet`.
 
-**Generic Usage**
-```
-nohup sh script.sh SCALE FORMAT
-```
 **TPC-DS**
 ```
 nohup sh util_tablegentpcds.sh 10 orc
@@ -56,43 +52,16 @@ nohup sh util_runtpcds.sh 10 orc
 nohup sh util_runtpch.sh 10 orc
 ```
 
-# Optional: Enable Performance Analysis Tool (PAT)
-## 1. Connect Head to Worker Node 
-```
-sh util_connect.sh YOURPASSWORD
-```
-
-## 2. Enable PAT
-Go into `util_runtpcds.sh` or `util_runtpch.sh`.
-Switch the command by un/commenting. Example below.
-```
-# ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
-
-./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
-```
-
-# Optional: Run Queries using Different Connection 
-Go into `util_internalRunQuery.sh`. Switch the command by uncommenting. Example below.
-Add the appropriate information (`CLUSTERNAME` and `PASSWORD`).
-```
-# timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
-
-timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
-```
-
 # Troubleshooting
 
+## Advanced Usage
+Learn about [Advanced Usage](README_advanced.md)
+
 ## Did my X step finish?
-Check the `aaa_clock.txt` or `aab_clock.txt` file.
+Check `aaa_clock.txt` file.
 ```
 ps -ef | grep .sh
 ps -ef | grep beeline
-```
-
-## Could not find database?
-In the `settings.sql` file, add.
-```
-use DATABASENAME;
 ```
 
 ## How to debug
