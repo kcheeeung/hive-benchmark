@@ -29,4 +29,4 @@ else
 fi
 
 # Misc recovery for system
-sleep 5
+sleep 10
