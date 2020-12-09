@@ -8,14 +8,34 @@ INTERNAL_QID=$5
 INTERNAL_CSV=$6
 
 TIME_TO_TIMEOUT=120m
+MODE='default'
 
 # Beeline command to execute
 START_TIME="`date +%s`"
-timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/$INTERNAL_DATABASE;transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
 
-# timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://CLUSTERNAME.azurehdinsight.net:443/$INTERNAL_DATABASE;ssl=true;transportMode=http;httpPath=/hive2" -n admin -p PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+if [[ $MODE == 'default' ]]; then
+    timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/${INTERNAL_DATABASE};transportMode=http" -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+    RETURN_VAL=$?
 
-RETURN_VAL=$?
+elif [[ $MODE == 'esp' ]]; then
+    echo 'YOURPASSWORD' | kinit USER
+    AAD_DOMAIN='MY_DOMAIN.COM'
+    USERNAME='hive'
+    timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/${INTERNAL_DATABASE};transportMode=http;httpPath=cliservice;principal=hive/_HOST@${AAD_DOMAIN}" -n $USERNAME -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+    RETURN_VAL=$?
+
+elif [[ $MODE == 'gateway' ]]; then
+    CLUSTERNAME='MYCLUSTER'
+    USERNAME='admin'
+    PASSWORD='password'
+    timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://${CLUSTERNAME}.azurehdinsight.net:443/${INTERNAL_DATABASE};ssl=true;transportMode=http;httpPath=/hive2" -n $USERNAME -p $PASSWORD -i $INTERNAL_SETTINGSPATH -f $INTERNAL_QUERYPATH &>> $INTERNAL_LOG_PATH
+    RETURN_VAL=$?
+
+else
+    echo "MODE must be 'default' | 'esp' | 'gateway'"
+    exit 1
+fi
+
 END_TIME="`date +%s`"
 
 if [[ $RETURN_VAL == 0 ]]; then
@@ -29,4 +49,4 @@ else
 fi
 
 # Misc recovery for system
-sleep 10
+sleep 20

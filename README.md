@@ -8,7 +8,7 @@
 
 ## Clone
 ```
-git clone https://github.com/kcheeeung/hive-testbench.git && cd hive-testbench/
+git clone https://github.com/kcheeeung/hive-benchmark.git && cd hive-benchmark/
 ```
 
 # Individual Steps
@@ -55,11 +55,12 @@ nohup sh util_runtpch.sh 10 orc
 # Troubleshooting
 
 ## Advanced Usage
-Learn about [Advanced Usage](README_advanced.md)
+Learn about [Advanced Usage and Recommended Setup](README_advanced.md)
 
 ## Did my X step finish?
 Check `aaa_clock.txt` file.
 ```
+ps -ef | grep sshuser
 ps -ef | grep .sh
 ps -ef | grep beeline
 ```
