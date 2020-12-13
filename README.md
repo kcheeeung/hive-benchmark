@@ -1,25 +1,32 @@
-# TPC-DS and TPC-H Benchmarks for Hive LLAP
-Fully automated TPC-DS and TPC-H benchmarks. Automation optimized specifically for Azure HDInsight Interactive Query. Should also work in other engines check the **Credits** section.
+# Steps to use
 
 ## Prerequisites
+- Hadoop 2.2 or later cluster or Sandbox.
 - Apache Hive.
 - Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
+- Have ```gcc``` in installed your system path. If your system does not have it, install it using yum or apt-get.
 
-# Individual Steps
-
-## 1. Clone
+## Clone
 ```
 git clone https://github.com/kcheeeung/hive-benchmark.git && cd hive-benchmark/
 ```
 
-## 2. Generate the data and tables
-Decide how much data you want. `SCALE` approximately is about # ~GB.
-Supported `FORMAT` includes: `orc` and `parquet`
+# Individual Steps
 
-**Generic Usage**
+## 1. Build the benchmark
+Build the benchmark you want to use (do all the prerequisites)
+
+**TPC-DS**
 ```
-nohup sh benchmark.sh SCALE FORMAT
+./tpcds-build.sh
 ```
+**TPC-H**
+```
+./tpch-build.sh
+```
+
+## 2. Generate the tables
+Decide how much data you want. `SCALE` approximately is about # ~GB. Supported `FORMAT` includes: `orc` and `parquet`.
 
 **TPC-DS**
 ```
@@ -31,51 +38,35 @@ nohup sh util_tablegentpch.sh 10 orc
 ```
 
 ## 3. Run all the queries
-- `SCALE` and `FORMAT` **must be the SAME as before or else it can't find the database name!**
-- Add or change your desired `settings.hql` file or path
+- `SCALE` **must be the SAME size from an existing database!**
+- Modify your settings in `settings.sql`.
+- By default each query has a timeout it set to **2 hours!** Change in `util_internalRunQuery.sh` where `TIME_TO_TIMEOUT=120m`.
 - Run the queries!
 
-**TPC-DS**
+**TPC-DS Benchmark**
 ```
 nohup sh util_runtpcds.sh 10 orc
 ```
-**TPC-H**
+**TPC-H Benchmark**
 ```
 nohup sh util_runtpch.sh 10 orc
 ```
 
 # Troubleshooting
 
+## Advanced Usage
+Learn about [Advanced Usage and Recommended Setup](README_advanced.md)
+
 ## Did my X step finish?
-Check the `aaa_clock.txt` file. Or run following:
+Check `aaa_clock.txt` file.
 ```
-ps -ef | grep '\.sh'
-```
-
-## Could not find database?
-In the `settings.hql` file, add:
-```
-use DATABASENAME;
+ps -ef | grep sshuser
+ps -ef | grep .sh
+ps -ef | grep beeline
 ```
 
-## Exception updating or communicating with metastore.
+## How to debug
+Uncomment the following line.
 ```
-ERROR : FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.MoveTask.
-Exception updating metastore for acid table
-
-ERROR : FAILED: Error in acquiring locks: Error communicating with the 
-metastore org.apache.hadoop.hive.ql.lockmgr.LockException.
+# DEBUG_SCRIPT=X
 ```
-Your SQL server likely has technical limitations. Check your metastore logs if you have `"The incoming request has too many parameters."` Change or add the following settings in `hive-site.xml` and restart Hive.
-```
-hive.direct.sql.max.elements.values.clause=200
-hive.direct.sql.max.elements.in.clause=200
-```
-
-## Data generation is taking long.
-This repository uses a Python user defined function. LLAP does not allow UDFs and was turned off.
-
-# Credits
-- https://github.com/dharmeshkakadia/tpcds-hdinsight
-- https://github.com/dharmeshkakadia/tpch-hdinsight
-- https://github.com/asonje/PAT

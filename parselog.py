@@ -5,64 +5,80 @@ LOG_FOLDER = "log_query/"
 BASE_LOG_NAME = "logquery"
 LOG_EXT = ".txt"
 
-def parse_log(path, cacheHitRatios):
-    """
-        Parses the target log. File size is converted into OUT_FILE_SIZE
-    """
-    found = 0
-    cacheHit, total = 0, 0
+""" BASE PARAMS """
+os.environ["TZ"]="US/Pacific"
+time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
+OUT_NAME = "llapio_summary" + time_id + ".csv"
+
+def getCacheHitRatio(path):
+    """ Returns the cache hit ratio """
+    cacheHit, miss, total = 0, 0, 0
 
     with open(path, "r") as file:
         for line in file:
             if "CACHE_HIT_BYTES" in line:
-                cacheHit = [int(item) for item in line.split() if item.isdigit()][0]
-                found += 1
+                cacheHit += [int(item) for item in line.split() if item.isdigit()][0]
             elif "CACHE_MISS_BYTES" in line:
-                miss = [int(item) for item in line.split() if item.isdigit()][0]
-                total = cacheHit + miss
-                found += 1
-
-            # Number of items to find before stop parsing
-            if found == 2:
-                break
-
-    if total != 0 and cacheHit != 0:
-        # query success
-        cacheHitRatios.append(cacheHit / total * 100)
+                miss += [int(item) for item in line.split() if item.isdigit()][0]
+    
+    total = cacheHit + miss
+    if total != 0:
+        return cacheHit / total * 100
     else:
         # query fail
-        cacheHitRatios.append(0)
+        return 0.12345
 
-def write_csv(cacheHitRatios):
+def getMetadataHitRatio(path):
+    """ Returns the metadata hit ratio. 'Cache retention rate basically' """
+    metadataHit, miss, total = 0, 0, 0
+
+    with open(path, "r") as file:
+        for line in file:
+            if "METADATA_CACHE_HIT" in line:
+                metadataHit += [int(item) for item in line.split() if item.isdigit()][0]
+            elif "METADATA_CACHE_MISS" in line:
+                miss += [int(item) for item in line.split() if item.isdigit()][0]
+        
+    total = metadataHit + miss
+    if total != 0:
+        return metadataHit / total * 100
+    else:
+        # query fail
+        return 0.12345
+
+def write_csv(cacheHitRatios, metadataHitRatio):
     """
         Writes info to a csv file.
+        Modify by adding new columns and map of parsed data.
     """
+    queryNum = list(cacheHitRatios.keys())
+    queryNum.sort(key=float)
+
     with open(OUT_NAME, "w", newline="") as output_csv:
         writer = csv.writer(output_csv)
         # header
-        head = ["Query#", "Cache Hit Ratio %"]
+        head = ["Query#", "Cache Hit %", "Metadata Hit %"]
         writer.writerow(head)
         # info
-        for i in range(len(cacheHitRatios)):
-            writer.writerow([i + 1, cacheHitRatios[i]])
+        for i in queryNum:
+            writer.writerow([float(i), cacheHitRatios[i], metadataHitRatio[i]])
 
-os.environ["TZ"]="US/Pacific"
-time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M.%S")
-OUT_NAME = "llapio_summary" + time_id + ".csv"
 def main():
-    # Range of queries. Counts the files so you don't need to know which benchmark it is
-    START = 1
-    END = 0
-    for file in os.listdir(LOG_FOLDER):
-        if file.startswith(BASE_LOG_NAME) and file.endswith(LOG_EXT):
-            END += 1
+    querynum_to_cacheratio = {}
+    querynum_to_metadatahitratio = {}
+    for filename in os.listdir(LOG_FOLDER):
+        if filename.startswith(BASE_LOG_NAME) and filename.endswith(LOG_EXT):
+            query_runNum = re.findall("\d+\.\d+", filename)
+            if len(query_runNum) == 1:
+                query_num = query_runNum[0]
+                filepath = LOG_FOLDER + filename
 
-    # parse all data
-    cacheHitRatios = list()
-    for i in range(START, END + 1):
-        parse_log(LOG_FOLDER + BASE_LOG_NAME + str(i) + LOG_EXT, cacheHitRatios)
+                querynum_to_cacheratio[query_num] = getCacheHitRatio(filepath)
+                querynum_to_metadatahitratio[query_num] = getMetadataHitRatio(filepath)
+            else:
+                raise Exception("Did not find query number in " + query_runNum)
 
-    write_csv(cacheHitRatios)
+    write_csv(querynum_to_cacheratio, querynum_to_metadatahitratio)
 
 if __name__ == "__main__":
     start = time.time()
