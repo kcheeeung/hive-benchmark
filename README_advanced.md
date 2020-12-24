@@ -34,6 +34,14 @@ The default method is a direct connection to the headnode. Modify to any of the 
 MODE='default'
 ```
 
+## Modifying Connection String
+File: `util_internalRunQuery.sh`
+
+The default method connects to the current node using port 10001. To change hostname or port modify ``` `hostname -f`:10001 ```
+```
+timeout $TIME_TO_TIMEOUT beeline -u "jdbc:hive2://`hostname -f`:10001/${INTERNAL_DATABASE};transportMode=http"
+```
+
 # Further Troubleshooting
 
 ## Exception updating or communicating with metastore.

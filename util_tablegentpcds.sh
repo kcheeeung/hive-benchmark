@@ -106,7 +106,7 @@ function create_managed_tables() {
 }
 
 function load_constraints() {
-    echo "Loading constraints"
+    echo "Start loading constraints"
     timedate
     runcommand "$BEELINEURL -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
     echo "Data loaded into database ${DATABASE}."
