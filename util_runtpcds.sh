@@ -88,11 +88,18 @@ function runBenchmark() {
 }
 
 function generateZipReport() {
+    # Final report location
+    FINAL_REPORT_LOCATION="/TPCDS_RESULTS/${SCALE}/"
+    hdfs dfs -mkdir -p ${FINAL_REPORT_LOCATION}
+    hdfs dfs -chmod 777 ${FINAL_REPORT_LOCATION}
+
     python3 parselog.py
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpcds-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
-    rm log_query.zip 
+    zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv"
+    rm log_query.zip
+
+    hdfs dfs -copyFromLocal "tpcds-${SCALE}GB-${ID}.zip" "${FINAL_REPORT_LOCATION}/tpcds-${SCALE}GB-${ID}.zip"
 }
 
 # --- SCRIPT START ---
