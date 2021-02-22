@@ -4,13 +4,14 @@
 The easiest way to setup is to create the tables using a Hadoop cluster. Once the tables are prepared, attach the target cluster to test.
 
 The following items for table preparation:
-- Hadoop cluster
+- Hadoop cluster (at least 16 core worker nodes)
 - External hive metastore
 - Storage account
 ```
-# Larger scales will require increased memory settings (example below)
+# Larger scales will require increased memory settings
+# Example using 10 worker nodes (16 cores) at scale 10000 (10TB)
 hive.tez.container.size=10240
-hive.tez.java.opts=-Xmx8192m
+hive.tez.java.opts=-Xmx8192M -Xms8192M
 ```
 
 ## Modifying Execution Method
