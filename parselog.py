@@ -26,18 +26,6 @@ class Query():
     def get_query_num(self):
         return self.query_num
 
-    def get_secs_taken(self):
-        return self.secs_taken
-
-    def get_cache_hit_ratio(self):
-        return self.cache_hit_ratio
-
-    def get_metadata_hit_ratio(self):
-        return self.metadata_hit_ratio
-
-    def set_query_num(self, query_num):
-        self.query_num = query_num
-
     def set_secs_taken(self, secs_taken):
         self.secs_taken = secs_taken
 
@@ -85,15 +73,15 @@ def parseLog(query_num, path):
     query = Query(query_num, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE)
 
     if found_time_taken:
-        query.set_secs_taken(round(secs_taken, 3))
+        query.set_secs_taken(round(secs_taken, 2))
 
     cache_total = cache_hit + cache_miss
     if cache_total != 0:
-        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 3))
+        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 2))
 
     metadata_total = metadata_hit + metadata_miss
     if metadata_total != 0:
-        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 3))
+        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 2))
 
     return query
 
@@ -133,4 +121,4 @@ if __name__ == "__main__":
     start = time.time()
     main()
     end = time.time()
-    print("Log parsing finished in {0} secs".format(round(end - start, 3)))
+    print("Log parsing finished in {0} secs".format(round(end - start, 2)))
