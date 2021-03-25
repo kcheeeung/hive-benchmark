@@ -73,15 +73,15 @@ def parseLog(query_num, path):
     query = Query(query_num, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE)
 
     if found_time_taken:
-        query.set_secs_taken(round(secs_taken, 2))
+        query.set_secs_taken(round(secs_taken, 1))
 
     cache_total = cache_hit + cache_miss
     if cache_total != 0:
-        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 2))
+        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 1))
 
     metadata_total = metadata_hit + metadata_miss
     if metadata_total != 0:
-        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 2))
+        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 1))
 
     return query
 
@@ -121,4 +121,4 @@ if __name__ == "__main__":
     start = time.time()
     main()
     end = time.time()
-    print("Log parsing finished in {0} secs".format(round(end - start, 2)))
+    print("Log parsing finished in {0} secs".format(round(end - start, 1)))
