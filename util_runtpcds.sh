@@ -44,8 +44,8 @@ function setupRun() {
     echo "New report generated"
 
     # remove old llapio_summary
-    rm "llapio_summary"*".csv"
-    echo "Old llapio_summary*.csv removed"
+    rm "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
+    echo "Old llapio_summary*.csv llap_mintimes_summary*.csv removed"
 
     # clear and make new log directory
     if [[ -d log_query/ ]]; then
@@ -93,10 +93,11 @@ function generateZipReport() {
     hdfs dfs -mkdir -p ${FINAL_REPORT_LOCATION}
     hdfs dfs -chmod 777 ${FINAL_REPORT_LOCATION}
 
-    python3 parselog.py
+    python3 parselog.py "${ID}"
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv"
+    zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
+    # zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     rm log_query.zip
 
     hdfs dfs -copyFromLocal "tpcds-${SCALE}GB-${ID}.zip" "${FINAL_REPORT_LOCATION}/tpcds-${SCALE}GB-${ID}.zip"
