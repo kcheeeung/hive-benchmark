@@ -8,7 +8,6 @@ LOG_EXT = ".txt"
 """ BASE PARAMS """
 os.environ["TZ"]="US/Pacific"
 time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
-OUT_NAME = "llapio_summary" + time_id + ".csv"
 
 class Query():
     """ A Query object will hold data relevant to the query """
@@ -25,6 +24,9 @@ class Query():
 
     def get_query_num(self):
         return self.query_num
+
+    def get_secs_taken(self):
+        return self.secs_taken
 
     def set_secs_taken(self, secs_taken):
         self.secs_taken = secs_taken
@@ -73,26 +75,38 @@ def parseLog(query_num, path):
     query = Query(query_num, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE, DUMMY_FAILED_VALUE)
 
     if found_time_taken:
-        query.set_secs_taken(round(secs_taken, 1))
+        query.set_secs_taken(round(secs_taken, 2))
 
     cache_total = cache_hit + cache_miss
     if cache_total != 0:
-        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 1))
+        query.set_cache_hit_ratio(round(cache_hit / cache_total * 100, 2))
 
     metadata_total = metadata_hit + metadata_miss
     if metadata_total != 0:
-        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 1))
+        query.set_metadata_hit_ratio(round(metadata_hit / metadata_total * 100, 2))
 
     return query
 
-def write_csv(query_object_map):
+def process_min_querytime(minquerytime_map, query_object):
+    """
+        This processes query objects to output a map of minimum times per query.
+    """
+    i = int(float(query_object.get_query_num()))
+    if i not in minquerytime_map:
+        minquerytime_map[i] = query_object.get_secs_taken()
+    else:
+        current_min_secs = minquerytime_map[i]
+        if query_object.get_secs_taken() < current_min_secs:
+            minquerytime_map[i] = query_object.get_secs_taken()
+
+def write_csv(query_object_map, output_file_name):
     """
         Writes info to a csv file.
     """
     query_num_list = list(query_object_map.keys())
     query_num_list.sort(key=float)
 
-    with open(OUT_NAME, "w", newline="") as output_csv:
+    with open(output_file_name, "w", newline="") as output_csv:
         writer = csv.writer(output_csv)
         writer.writerow(Query.csv_header)
         # info
@@ -100,8 +114,23 @@ def write_csv(query_object_map):
             query_object = query_object_map[i]
             writer.writerow(query_object.get_csv_row())
 
+def write_mintimes_csv(minquerytime_map, output_file_name):
+    """
+        Writes the minimum time of each query to a csv file.
+    """
+    query_num_list = list(minquerytime_map.keys())
+    query_num_list.sort(key=float)
+
+    with open(output_file_name, "w", newline="") as output_csv:
+        writer = csv.writer(output_csv)
+        writer.writerow(["Query#", "Secs"])
+        # info
+        for i in query_num_list:
+            writer.writerow([i, minquerytime_map[i]])
+
 def main():
     querynum_to_queryobject = {}
+    minquerytime_map = {}
 
     for filename in os.listdir(LOG_FOLDER):
         if filename.startswith(BASE_LOG_NAME) and filename.endswith(LOG_EXT):
@@ -111,14 +140,16 @@ def main():
                 filepath = LOG_FOLDER + filename
 
                 query_object = parseLog(query_num, filepath)
+                process_min_querytime(minquerytime_map, query_object)
                 querynum_to_queryobject[query_object.get_query_num()] = query_object
             else:
                 raise Exception("Did not find query number in " + query_runNum)
 
-    write_csv(querynum_to_queryobject)
+    write_csv(querynum_to_queryobject, "llapio_summary{0}.csv".format(time_id))
+    write_mintimes_csv(minquerytime_map, "llap_mintimes_summary{0}.csv".format(time_id))
 
 if __name__ == "__main__":
     start = time.time()
     main()
     end = time.time()
-    print("Log parsing finished in {0} secs".format(round(end - start, 1)))
+    print("Log parsing finished in {0} secs".format(round(end - start, 2)))
