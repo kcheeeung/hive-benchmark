@@ -1,13 +1,9 @@
-import time, csv, re, os, datetime
+import argparse, csv, os, re, time
 
 """ Log location """
 LOG_FOLDER = "log_query/"
 BASE_LOG_NAME = "logquery"
 LOG_EXT = ".txt"
-
-""" BASE PARAMS """
-os.environ["TZ"]="US/Pacific"
-time_id = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M")
 
 class Query():
     """ A Query object will hold data relevant to the query """
@@ -129,6 +125,11 @@ def write_mintimes_csv(minquerytime_map, output_file_name):
             writer.writerow([i, minquerytime_map[i]])
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("time_id", type=str, help="An id is required to identify reports.")
+    args = parser.parse_args()
+    time_id = args.time_id
+
     querynum_to_queryobject = {}
     minquerytime_map = {}
 

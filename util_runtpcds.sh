@@ -93,7 +93,7 @@ function generateZipReport() {
     hdfs dfs -mkdir -p ${FINAL_REPORT_LOCATION}
     hdfs dfs -chmod 777 ${FINAL_REPORT_LOCATION}
 
-    python3 parselog.py
+    python3 parselog.py "${ID}"
     mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
     zip -j log_query.zip log_query/*
     zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
