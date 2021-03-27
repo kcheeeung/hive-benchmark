@@ -31,16 +31,16 @@ function setupRun() {
     # --- CLOCK ---
     CLOCK_FILE="aaa_clocktime.txt"
 
-    if [[ -f $CLOCK_FILE ]]; then
-        rm $CLOCK_FILE
+    if [[ -f "${CLOCK_FILE}" ]]; then
+        rm "${CLOCK_FILE}"
         echo "Old clock removed"
     fi
     echo "Created new clock"
 
     # generate time report
-    rm $REPORT_NAME*".csv"
+    rm "${REPORT_NAME}"*".csv"
     echo "Old report removed"
-    echo "query #", "secs elapsed", "status" > $REPORT_NAME".csv"
+    echo "query #", "secs elapsed", "status" > "${REPORT_NAME}.csv"
     echo "New report generated"
 
     # remove old llapio_summary
@@ -65,15 +65,15 @@ function setupRun() {
 }
 
 function runBenchmark() {
-    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > $CLOCK_FILE
-    timedate >> $CLOCK_FILE
+    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > "${CLOCK_FILE}"
+    timedate >> "${CLOCK_FILE}"
     
     # range of queries
     START=1
     END=99
     REPEAT=1
     for (( QUERY_NUM = ${START}; QUERY_NUM <= ${END}; QUERY_NUM++ )); do
-        for (( j = 0; j < $REPEAT; j++ )); do
+        for (( j = 0; j < ${REPEAT}; j++ )); do
             query_path=("${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT}")
             LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
@@ -83,8 +83,8 @@ function runBenchmark() {
         done
     done
 
-    echo "Finished" >> $CLOCK_FILE
-    timedate >> $CLOCK_FILE
+    echo "Finished" >> "${CLOCK_FILE}"
+    timedate >> "${CLOCK_FILE}"
 }
 
 function generateZipReport() {
@@ -94,7 +94,7 @@ function generateZipReport() {
     hdfs dfs -chmod 777 "${FINAL_REPORT_LOCATION}"
 
     python3 parselog.py "${ID}"
-    mv $REPORT_NAME".csv" $REPORT_NAME"$ID"".csv"
+    mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
     zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     # zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
@@ -104,17 +104,17 @@ function generateZipReport() {
 }
 
 # --- SCRIPT START ---
-SCALE=$1
-FORMAT=$2
+SCALE=${1}
+FORMAT=${2}
 
-if [[ "X$SCALE" == "X" || $SCALE -eq 1 ]]; then
+if [[ "X${SCALE}" == "X" || ${SCALE} -eq 1 ]]; then
     usageExit
 fi
-if ! [[ "$SCALE" =~ ^[0-9]+$ ]]; then
-    echo "'$SCALE' is not a number!"
+if ! [[ "${SCALE}" =~ ^[0-9]+$ ]]; then
+    echo "'${SCALE}' is not a number!"
     usageExit
 fi
-if [[ "$FORMAT" != "orc" && "$FORMAT" != "parquet" ]]; then
+if [[ "${FORMAT}" != "orc" && "${FORMAT}" != "parquet" ]]; then
     usageExit
 fi
 
