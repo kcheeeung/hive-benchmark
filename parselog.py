@@ -39,7 +39,9 @@ def parseLog(query_num, path):
 
         1. The precise time of query by using the recorded in the logs. Also assumes target is formatted as:
            "1 row selected (1.23 seconds)"
+           "1 row selected (1 seconds)"
            "2 rows selected (1.23 seconds)"
+           "2 rows selected (1 seconds)"
         2. Cache hit ratio.
         3. Metadata hit ratio. "Cache retention rate".
     """
@@ -52,7 +54,8 @@ def parseLog(query_num, path):
         for line in file:
             # Parse time taken
             if "rows selected (" in line or "row selected (" in line:
-                secs_taken += float(re.findall("[0-9]+\\.[0-9]+", line)[0])
+                number_string=line.split()[3]
+                secs_taken += float(number_string.replace('(', ''))
                 found_time_taken = True
 
             # Parse cache hit ratio
