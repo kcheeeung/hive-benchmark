@@ -13,7 +13,7 @@ function usageExit() {
 }
 
 function setupRun() {
-    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S"`
+    ID=$(TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S")
 
     # --- QUERY FILE NAME ---
     QUERY_BASE_NAME="sample-queries-tpcds/query"
@@ -61,7 +61,7 @@ function setupRun() {
     chmod -R +x PAT/
 
     # absolute path
-    CURR_DIR="`pwd`/"
+    CURR_DIR="$(pwd)/"
 }
 
 function runBenchmark() {
@@ -72,9 +72,9 @@ function runBenchmark() {
     START=1
     END=99
     REPEAT=1
-    for (( QUERY_NUM = $START; QUERY_NUM <= $END; QUERY_NUM++ )); do
-        for (( j = 0; j < $REPEAT; j++ )); do
-            query_path=(${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT})
+    for (( QUERY_NUM = START; QUERY_NUM <= END; QUERY_NUM++ )); do
+        for (( j = 0; j < REPEAT; j++ )); do
+            query_path=("${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT}")
             LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
             ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
@@ -90,11 +90,11 @@ function runBenchmark() {
 function generateZipReport() {
     # Final report location
     FINAL_REPORT_LOCATION="/TPCDS_RESULTS/${SCALE}/"
-    hdfs dfs -mkdir -p ${FINAL_REPORT_LOCATION}
-    hdfs dfs -chmod 777 ${FINAL_REPORT_LOCATION}
+    hdfs dfs -mkdir -p "${FINAL_REPORT_LOCATION}"
+    hdfs dfs -chmod 777 "${FINAL_REPORT_LOCATION}"
 
     python3 parselog.py "${ID}"
-    mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
+    mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
     zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     # zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
