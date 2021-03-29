@@ -36,7 +36,7 @@ function generate_data() {
     hdfs dfs -ls "${DIR}/${SCALE}" > /dev/null
     if [[ $? -ne 0 ]]; then
         echo "Generating data at scale factor $SCALE"
-        (cd tpcds-gen; hadoop jar target/*.jar -d ${DIR}/${SCALE}/ -s ${SCALE})
+        (cd tpcds-gen; hadoop jar target/*.jar -d "${DIR}/${SCALE}"/ -s "${SCALE}")
     fi
     hdfs dfs -ls "${DIR}/${SCALE}" > /dev/null
     if [[ $? -ne 0 ]]; then
