@@ -52,7 +52,8 @@ def parseLog(query_num, path):
         for line in file:
             # Parse time taken
             if "rows selected (" in line or "row selected (" in line:
-                secs_taken += float(re.findall("[0-9]+\\.[0-9]+", line)[0])
+                number_string=line.split()[3]
+                secs_taken += float(number_string.replace('(', ''))
                 found_time_taken = True
 
             # Parse cache hit ratio
