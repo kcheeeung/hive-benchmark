@@ -39,7 +39,9 @@ def parseLog(query_num, path):
 
         1. The precise time of query by using the recorded in the logs. Also assumes target is formatted as:
            "1 row selected (1.23 seconds)"
+           "1 row selected (1 seconds)"
            "2 rows selected (1.23 seconds)"
+           "2 rows selected (1 seconds)"
         2. Cache hit ratio.
         3. Metadata hit ratio. "Cache retention rate".
     """
