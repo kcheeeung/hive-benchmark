@@ -43,7 +43,7 @@ def parseLog(query_num, path):
         2. Cache hit ratio.
         3. Metadata hit ratio. "Cache retention rate".
     """
-    DUMMY_FAILED_VALUE = 0.0123
+    DUMMY_FAILED_VALUE = 999999
     secs_taken, found_time_taken = 0, False
     cache_hit, cache_miss, cache_total = 0, 0, 0
     metadata_hit, metadata_miss, metadata_total = 0, 0, 0
