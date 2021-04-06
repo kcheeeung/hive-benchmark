@@ -127,7 +127,7 @@ function analyze_tables() {
 
 # --- SCRIPT START ---
 
-# DEBUG_SCRIPT="X"
+DEBUG_SCRIPT="X"
 SCALE=$1
 FORMAT=$2
 DIR=/tmp/tpcds-generate

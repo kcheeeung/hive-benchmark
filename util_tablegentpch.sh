@@ -87,13 +87,13 @@ function create_managed_tables() {
     timedate
 }
 
-# function load_constraints() {
-#     echo "Start loading constraints"
-#     timedate
-#     runcommand "$BEELINEURL -f ddl-tpcds/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
-#     echo "Data loaded into database ${DATABASE}."
-#     timedate
-# }
+function load_constraints() {
+    echo "Start loading constraints"
+    timedate
+    runcommand "$BEELINEURL -f ddl-tpch/bin_partitioned/add_constraints.sql --hivevar DB=${DATABASE}"
+    echo "Data loaded into database ${DATABASE}."
+    timedate
+}
 
 function analyze_tables() {
     echo "Start analysis"
@@ -105,7 +105,7 @@ function analyze_tables() {
 
 # --- SCRIPT START ---
 
-# DEBUG_SCRIPT="X"
+DEBUG_SCRIPT="X"
 SCALE=$1
 FORMAT=$2
 DIR=/tmp/tpch-generate
@@ -136,6 +136,6 @@ create_text_tables
 
 create_managed_tables
 
-# load_constraints
+load_constraints
 
 analyze_tables
