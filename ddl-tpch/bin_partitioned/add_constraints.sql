@@ -21,5 +21,5 @@ alter table ORDERS add constraint ${DB}_fk_oock foreign key (O_CUSTKEY) referenc
 alter table LINEITEM add constraint ${DB}_fk_llok foreign key (L_ORDERKEY) references ORDERS (O_ORDERKEY) disable novalidate rely;
 alter table LINEITEM add constraint ${DB}_fk_llpka foreign key (L_PARTKEY) references PARTSUPP (PS_PARTKEY) disable novalidate rely;
 alter table LINEITEM add constraint ${DB}_fk_llpkb foreign key (L_PARTKEY) references PARTSUPP (PS_SUPPKEY) disable novalidate rely;
-alter table LINEITEM add constraint ${DB}_fk_llpkb foreign key (L_SUPPKEY) references SUPPLIER (S_SUPPKEY) disable novalidate rely;
+alter table LINEITEM add constraint ${DB}_fk_llsk foreign key (L_SUPPKEY) references SUPPLIER (S_SUPPKEY) disable novalidate rely;
 alter table NATION add constraint ${DB}_fk_nnrk foreign key (N_REGIONKEY) references REGION (R_REGIONKEY) disable novalidate rely;
