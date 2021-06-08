@@ -68,5 +68,5 @@ ps -ef | grep beeline
 ## How to debug
 Uncomment the following line.
 ```
-# DEBUG_SCRIPT=X
+# DEBUG_SCRIPT=true
 ```

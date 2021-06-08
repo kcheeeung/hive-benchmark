@@ -13,7 +13,7 @@ function usageExit() {
 }
 
 function runcommand() {
-    if [[ "X$DEBUG_SCRIPT" != "X" ]]; then
+    if [[ "$DEBUG_SCRIPT" == "true" ]]; then
         $1
         RETURN_VAL=$?
     else
@@ -63,7 +63,7 @@ function create_managed_tables() {
 
     LOAD_FILE="load_${FORMAT}_${SCALE}.mk"
     SILENCE="2> /dev/null 1> /dev/null" 
-    if [ "X$DEBUG_SCRIPT" != "X" ]; then
+    if [ "$DEBUG_SCRIPT" == "true" ]; then
         SILENCE=""
     fi
 
@@ -127,7 +127,7 @@ function analyze_tables() {
 
 # --- SCRIPT START ---
 
-DEBUG_SCRIPT="X"
+DEBUG_SCRIPT="true"
 SCALE=$1
 FORMAT=$2
 DIR=/tmp/tpcds-generate
@@ -137,7 +137,7 @@ if [[ ! -f tpcds-gen/target/tpcds-gen-1.0-SNAPSHOT.jar ]]; then
     exit 1
 fi
 
-if [[ "X$DEBUG_SCRIPT" != "X" ]]; then
+if [[ "$DEBUG_SCRIPT" == "true" ]]; then
     set -x
 fi
 if [[ "X$SCALE" == "X" || $SCALE -eq 1 ]]; then

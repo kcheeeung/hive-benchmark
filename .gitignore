@@ -5,3 +5,6 @@ target/
 derby.log
 log_query/
 llapio*.csv
+*.prefs
+.classpath
+.project
