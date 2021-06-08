@@ -98,7 +98,7 @@ function load_constraints() {
 function analyze_tables() {
     echo "Start analysis"
     timedate
-    runcommand "$BEELINEURL -i settings/load-partitioned.sql -f ddl-tpch/bin_partitioned/analyze.sql --hivevar DB=${DATABASE}"
+    runcommand "$BEELINEURL -f ddl-tpch/bin_partitioned/analyze.sql --hivevar DB=${DATABASE}"
     echo "Finish analysis"
     timedate
 }
