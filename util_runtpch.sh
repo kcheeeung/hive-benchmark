@@ -1,36 +1,41 @@
 #!/bin/bash
 
-# Run and time the benchmark without baby sitting the scripts
-# Use: nohup
+function timedate() {
+    TZ="America/Los_Angeles" date
+    echo ""
+}
 
+function usageExit() {
+    echo "Usage: sh util_runtpch.sh SCALE FORMAT"
+    echo "SCALE must be greater than 1"
+    echo "FORMAT must be either 'orc' | 'parquet'"
+    exit 1
+}
 
-if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
-    # query file name
-    QUERY_BASE_NAME="sample-queries-tpch/tpch_query"
+function setupRun() {
+    ID=$(TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S")
+
+    # --- QUERY FILE NAME ---
+    QUERY_BASE_NAME="sample-queries-tpch/query"
     QUERY_FILE_EXT=".sql"
-    # settings file location
+    
+    # --- SETTINGS ---
     SETTINGS_PATH="settings.sql"
 
-
-    # scale ~GB
-    SCALE="$1"
-    # report name
+    # --- REPORT NAME ---
     REPORT_NAME="time_elapsed_tpch"
-    # database name
-    DATABASE="tpch_flat_orc_"$SCALE
-    # hostname
-    HOSTNAME=`hostname`
-    # name of clock file
-    CLOCK_FILE="aaa_clocktime.txt"
 
+    # --- DATABASE ---
+    DATABASE="tpch_bin_partitioned_${FORMAT}_${SCALE}"
+
+    # --- CLOCK ---
+    CLOCK_FILE="aaa_clocktime.txt"
 
     if [[ -f $CLOCK_FILE ]]; then
         rm $CLOCK_FILE
         echo "Old clock removed"
     fi
     echo "Created new clock"
-    echo "Run queries for TPC-H at scale "$SCALE > $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
 
     # generate time report
     rm $REPORT_NAME*".csv"
@@ -39,8 +44,8 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     echo "New report generated"
 
     # remove old llapio_summary
-    rm "llapio_summary"*".csv"
-    echo "Old llapio_summary*.csv removed"
+    rm "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
+    echo "Old llapio_summary*.csv llap_mintimes_summary*.csv removed"
 
     # clear and make new log directory
     if [[ -d log_query/ ]]; then
@@ -56,30 +61,65 @@ if [[ "$1" =~ ^[0-9]+$ && "$1" -gt "1" ]]; then
     chmod -R +x PAT/
 
     # absolute path
-    CURR_DIR="`pwd`/"
+    CURR_DIR="$(pwd)/"
+}
 
-    ID=`TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S"`
+function runBenchmark() {
+    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+    
     # range of queries
     START=1
-    END=22
-    for (( i = $START; i <= $END; i++ )); do
-        query_path=($QUERY_BASE_NAME$i$QUERY_FILE_EXT)
-        LOG_PATH="log_query/logquery$i.txt"
-    
-        ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv"
+    END=99
+    REPEAT=1
+    for (( QUERY_NUM = START; QUERY_NUM <= END; QUERY_NUM++ )); do
+        for (( j = 0; j < REPEAT; j++ )); do
+            query_path=("${QUERY_BASE_NAME}${QUERY_NUM}${QUERY_FILE_EXT}")
+            LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
-        # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$i" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
+            ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
 
+            # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
+        done
     done
 
     echo "Finished" >> $CLOCK_FILE
-    TZ='America/Los_Angeles' date >> $CLOCK_FILE
+    timedate >> $CLOCK_FILE
+}
+
+function generateZipReport() {
+    # Final report location
+    FINAL_REPORT_LOCATION="/TPCH_RESULTS/${SCALE}/"
+    hdfs dfs -mkdir -p "${FINAL_REPORT_LOCATION}"
+    hdfs dfs -chmod 777 "${FINAL_REPORT_LOCATION}"
 
     python3 parselog.py "${ID}"
-    mv $REPORT_NAME".csv" $REPORT_NAME$ID".csv"
+    mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpch-"$SCALE"GB-"$ID".zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* $REPORT_NAME$ID".csv" "llapio_summary"*".csv"
+    zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
+    # zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     rm log_query.zip
-else
-    echo "Invalid entry. Scale must also be greater than 1."
+
+    hdfs dfs -copyFromLocal "tpch-${SCALE}GB-${ID}.zip" "${FINAL_REPORT_LOCATION}/tpch-${SCALE}GB-${ID}.zip"
+}
+
+# --- SCRIPT START ---
+SCALE=$1
+FORMAT=$2
+
+if [[ "X$SCALE" == "X" || $SCALE -eq 1 ]]; then
+    usageExit
 fi
+if ! [[ "$SCALE" =~ ^[0-9]+$ ]]; then
+    echo "'$SCALE' is not a number!"
+    usageExit
+fi
+if [[ "$FORMAT" != "orc" && "$FORMAT" != "parquet" ]]; then
+    usageExit
+fi
+
+setupRun
+
+runBenchmark
+
+generateZipReport
