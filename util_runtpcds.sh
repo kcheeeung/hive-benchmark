@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function timedate() {
-    TZ="America/Los_Angeles" date
+    TZ="${TIMEZONE}" date
     echo ""
 }
 
@@ -13,7 +13,7 @@ function usageExit() {
 }
 
 function setupRun() {
-    ID=$(TZ='America/Los_Angeles' date +"%m.%d.%Y-%H.%M.%S")
+    ID=$(TZ="${TIMEZONE}" date +"%m.%d.%Y-%H.%M.%S")
 
     # --- QUERY FILE NAME ---
     QUERY_BASE_NAME="sample-queries-tpcds/query"
@@ -106,6 +106,7 @@ function generateZipReport() {
 # --- SCRIPT START ---
 SCALE=$1
 FORMAT=$2
+TIMEZONE="America/Los_Angeles"
 
 if [[ "X$SCALE" == "X" || $SCALE -eq 1 ]]; then
     usageExit
