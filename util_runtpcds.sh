@@ -40,7 +40,7 @@ function setupRun() {
     # generate time report
     rm $REPORT_NAME*".csv"
     echo "Old report removed"
-    echo "query #", "secs elapsed", "status" > $REPORT_NAME".csv"
+    echo "query #", "secs elapsed", "status" > "${REPORT_NAME}.csv"
     echo "New report generated"
 
     # remove old llapio_summary
@@ -93,10 +93,10 @@ function generateZipReport() {
     hdfs dfs -mkdir -p "${FINAL_REPORT_LOCATION}"
     hdfs dfs -chmod 777 "${FINAL_REPORT_LOCATION}"
 
-    python3 parselog.py "${ID}"
+    python3 parselog.py --test_type "tpcds" --time_id "${ID}"
     mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
+    zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summarytpcds"*".csv" "llap_mintimes_summarytpcds"*".csv"
     # zip -r "tpcds-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpcdsPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     rm log_query.zip
 
