@@ -147,8 +147,8 @@ def main():
             else:
                 raise Exception("Did not find query number in " + query_runNum)
 
-    write_csv(querynum_to_queryobject, "llapio_summary{0}.csv".format(time_id))
-    write_mintimes_csv(minquerytime_map, "llap_mintimes_summary{0}.csv".format(time_id))
+    write_csv(querynum_to_queryobject, "llapio_summary_{0}.csv".format(time_id))
+    write_mintimes_csv(minquerytime_map, "llap_mintimes_summary_{0}.csv".format(time_id))
 
 if __name__ == "__main__":
     start = time.time()
