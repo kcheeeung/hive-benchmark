@@ -70,7 +70,7 @@ function runBenchmark() {
     
     # range of queries
     START=1
-    END=99
+    END=22
     REPEAT=1
     for (( QUERY_NUM = START; QUERY_NUM <= END; QUERY_NUM++ )); do
         for (( j = 0; j < REPEAT; j++ )); do
