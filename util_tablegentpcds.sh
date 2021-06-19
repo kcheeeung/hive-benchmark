@@ -62,9 +62,9 @@ function create_managed_tables() {
     timedate
 
     LOAD_FILE="load_${FORMAT}_${SCALE}.mk"
-    SILENCE="2> /dev/null 1> /dev/null" 
-    if [ "$DEBUG_SCRIPT" == "true" ]; then
-        SILENCE=""
+    SILENCE=""
+    if [ "$DEBUG_SCRIPT" != "true" ]; then
+        SILENCE="2> /dev/null 1> /dev/null" 
     fi
 
     DIMS="date_dim time_dim item customer customer_demographics household_demographics customer_address store promotion warehouse ship_mode reason income_band call_center web_page catalog_page web_site"
