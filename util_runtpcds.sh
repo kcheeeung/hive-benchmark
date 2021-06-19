@@ -31,14 +31,14 @@ function setupRun() {
     # --- CLOCK ---
     CLOCK_FILE="aaa_clocktime.txt"
 
-    if [[ -f $CLOCK_FILE ]]; then
-        rm $CLOCK_FILE
+    if [[ -f "${CLOCK_FILE}" ]]; then
+        rm "${CLOCK_FILE}"
         echo "Old clock removed"
     fi
     echo "Created new clock"
 
     # generate time report
-    rm $REPORT_NAME*".csv"
+    rm "${REPORT_NAME}"*".csv"
     echo "Old report removed"
     echo "query #", "secs elapsed", "status" > "${REPORT_NAME}.csv"
     echo "New report generated"
@@ -65,8 +65,8 @@ function setupRun() {
 }
 
 function runBenchmark() {
-    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > $CLOCK_FILE
-    timedate >> $CLOCK_FILE
+    echo "Run queries for TPC-DS ${FORMAT} at scale ${SCALE}" > "${CLOCK_FILE}"
+    timedate >> "${CLOCK_FILE}"
     
     # range of queries
     START=1
@@ -83,8 +83,8 @@ function runBenchmark() {
         done
     done
 
-    echo "Finished" >> $CLOCK_FILE
-    timedate >> $CLOCK_FILE
+    echo "Finished" >> "${CLOCK_FILE}"
+    timedate >> "${CLOCK_FILE}"
 }
 
 function generateZipReport() {
