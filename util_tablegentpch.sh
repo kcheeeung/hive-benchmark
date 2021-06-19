@@ -136,6 +136,6 @@ create_text_tables
 
 create_managed_tables
 
-load_constraints
+# load_constraints # Constraints not added
 
 analyze_tables
