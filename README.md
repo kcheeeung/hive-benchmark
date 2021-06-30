@@ -66,7 +66,7 @@ ps -ef | grep beeline
 ```
 
 ## How to debug
-Uncomment the following line.
+Debug is enabled by default.
 ```
-# DEBUG_SCRIPT=X
+DEBUG_SCRIPT=true
 ```

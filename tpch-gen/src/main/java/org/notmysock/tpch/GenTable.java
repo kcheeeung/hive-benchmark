@@ -60,7 +60,6 @@ public class GenTable extends Configured implements Tool {
         String[] remainingArgs = new GenericOptionsParser(getConf(), args).getRemainingArgs();
 
         CommandLineParser parser = new BasicParser();
-        getConf().setInt("io.sort.mb", 4);
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("s","scale", true, "scale");
         options.addOption("t","table", true, "table");
@@ -104,10 +103,15 @@ public class GenTable extends Configured implements Tool {
                     dsuri.getPort(),dsuri.getPath(), 
                     dsuri.getQuery(),"dbgen");
         Configuration conf = getConf();
-        conf.setInt("mapred.task.timeout",0);
-        conf.setInt("mapreduce.task.timeout",0);
-        DistributedCache.addCacheArchive(link, conf);
-        Job job = new Job(conf, "GenTable+"+table+"_"+scale);
+        conf.set("fs.permissions.umask-mode", "000");
+        conf.setInt("mapred.task.timeout", 0);
+        conf.setInt("mapreduce.task.timeout", 0);
+        conf.setBoolean("mapreduce.map.output.compress", true);
+        conf.set("mapreduce.map.output.compress.codec", "org.apache.hadoop.io.compress.GzipCodec");
+        // DistributedCache.addCacheArchive(link, conf);
+        // Job job = new Job(conf, "GenTable+"+table+"_"+scale);
+        Job job = Job.getInstance(conf, "GenTableTPCH+" + table + "_" + scale);
+        job.addCacheArchive(link);
         job.setJarByClass(getClass());
         job.setNumReduceTasks(0);
         job.setMapperClass(dbgen.class);

@@ -129,9 +129,10 @@ def write_mintimes_csv(minquerytime_map, output_file_name):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("time_id", type=str, help="An id is required to identify reports.")
+    parser.add_argument("--test_type", choices=["tpcds", "tpch"], type=str, help="The type of test you are running.")
+    parser.add_argument("--time_id", type=str, help="An id is required to identify reports.")
     args = parser.parse_args()
-    time_id = args.time_id
+    time_id = "{0}_{1}".format(args.test_type, args.time_id)
 
     querynum_to_queryobject = {}
     minquerytime_map = {}
@@ -149,8 +150,8 @@ def main():
             else:
                 raise Exception("Did not find query number in " + query_runNum)
 
-    write_csv(querynum_to_queryobject, "llapio_summary{0}.csv".format(time_id))
-    write_mintimes_csv(minquerytime_map, "llap_mintimes_summary{0}.csv".format(time_id))
+    write_csv(querynum_to_queryobject, "llapio_summary_{0}.csv".format(time_id))
+    write_mintimes_csv(minquerytime_map, "llap_mintimes_summary_{0}.csv".format(time_id))
 
 if __name__ == "__main__":
     start = time.time()

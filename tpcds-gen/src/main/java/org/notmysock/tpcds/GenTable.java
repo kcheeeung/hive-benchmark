@@ -78,7 +78,7 @@ public class GenTable extends Configured implements Tool {
     conf.set("mapreduce.map.output.compress.codec", "org.apache.hadoop.io.compress.GzipCodec");
     // DistributedCache.addCacheArchive(link, conf);
     // DistributedCache.createSymlink(conf);
-    Job job = Job.getInstance(conf, "GenTable+" + table + "_" + scale);
+    Job job = Job.getInstance(conf, "GenTableTPCDS+" + table + "_" + scale);
     job.addCacheArchive(link);
     job.setJarByClass(getClass());
     job.setNumReduceTasks(0);
