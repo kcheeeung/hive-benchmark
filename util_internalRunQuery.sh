@@ -11,7 +11,7 @@ TIME_TO_TIMEOUT=120m
 MODE='default'
 
 # Beeline command to execute
-START_TIME="$(date +%s)"
+START_TIME="$(date +%s.%N)"
 
 if [[ "${MODE}" == 'default' ]]; then
     timeout "${TIME_TO_TIMEOUT}" beeline -u "jdbc:hive2://$(hostname -f):10001/${INTERNAL_DATABASE};transportMode=http" -i "${INTERNAL_SETTINGSPATH}" -f "${INTERNAL_QUERYPATH}" &>> "${INTERNAL_LOG_PATH}"
@@ -35,10 +35,10 @@ else
     exit 1
 fi
 
-END_TIME="$(date +%s)"
+END_TIME="$(date +%s.%N)"
 
 if [[ "${RETURN_VAL}" == 0 ]]; then
-    secs_elapsed="$((END_TIME - START_TIME))"
+    secs_elapsed="$(echo "$END_TIME - $START_TIME" | bc -l)"
     echo "${INTERNAL_QID}, ${secs_elapsed}, SUCCESS" >> "${INTERNAL_CSV}"
     echo "query${INTERNAL_QID}: SUCCESS"
 else

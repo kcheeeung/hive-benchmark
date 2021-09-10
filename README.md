@@ -1,14 +1,18 @@
 # Steps to use
 
 ## Prerequisites
-- Hadoop 2.2 or later cluster or Sandbox.
+- Hadoop 3.1 or later cluster.
 - Apache Hive.
 - Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
-- Have ```gcc``` in installed your system path. If your system does not have it, install it using yum or apt-get.
+- Have the following packages. If your system does not have it, install it using apt-get or similar.
+    ```
+    bc, date, gcc, nohup, python3, timeout, zip
+    ```
 
 ## Clone
 ```
-git clone https://github.com/kcheeeung/hive-benchmark.git && cd hive-benchmark/
+git clone https://github.com/kcheeeung/hive-benchmark.git
+cd hive-benchmark/
 ```
 
 # Individual Steps
