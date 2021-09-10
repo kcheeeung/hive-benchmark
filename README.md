@@ -4,9 +4,9 @@
 - Hadoop 3.1 or later cluster.
 - Apache Hive.
 - Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
-- Have packages
+- Have the following packages. If your system does not have it, install it using apt-get or similar.
     ```
-    gcc, timeout, date, nohup, bc 
+    bc, date, gcc, nohup, python3, timeout
     ```
 
 ## Clone
