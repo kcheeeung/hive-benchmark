@@ -6,7 +6,7 @@
 - Between 15 minutes and 2 days to generate data (depending on the Scale Factor you choose and available hardware).
 - Have the following packages. If your system does not have it, install it using apt-get or similar.
     ```
-    bc, date, gcc, nohup, python3, timeout
+    bc, date, gcc, nohup, python3, timeout, zip
     ```
 
 ## Clone
