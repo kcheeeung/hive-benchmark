@@ -96,7 +96,7 @@ function generateZipReport() {
     python3 parselog.py --test_type "tpch" --time_id "${ID}"
     mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
-    zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summarytpch"*".csv" "llap_mintimes_summarytpch"*".csv"
+    zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary_tpch"*".csv" "llap_mintimes_summary_tpch"*".csv"
     # zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     rm log_query.zip
 
