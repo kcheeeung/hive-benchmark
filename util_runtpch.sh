@@ -58,7 +58,6 @@ function setupRun() {
     # make executable
     chmod +x util_internalGetPAT.sh
     chmod +x util_internalRunQuery.sh
-    chmod -R +x PAT/
 
     # absolute path
     CURR_DIR="$(pwd)/"
@@ -78,8 +77,6 @@ function runBenchmark() {
             LOG_PATH="log_query/logquery${QUERY_NUM}.${j}.txt"
 
             ./util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv"
-
-            # ./util_internalGetPAT.sh /$CURR_DIR/util_internalRunQuery.sh "$DATABASE" "$CURR_DIR$SETTINGS_PATH" "$CURR_DIR$query_path" "$CURR_DIR$LOG_PATH" "$QUERY_NUM" "$CURR_DIR$REPORT_NAME.csv" tpchPAT"$ID"/query"$i"/
         done
     done
 
@@ -97,7 +94,6 @@ function generateZipReport() {
     mv "${REPORT_NAME}.csv" "${REPORT_NAME}${ID}.csv"
     zip -j log_query.zip log_query/*
     zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip "${REPORT_NAME}${ID}.csv" "llapio_summary_tpch"*".csv" "llap_mintimes_summary_tpch"*".csv"
-    # zip -r "tpch-${SCALE}GB-${ID}.zip" log_query.zip PAT/PAT-collecting-data/results/tpchPAT"$ID"/* "${REPORT_NAME}${ID}.csv" "llapio_summary"*".csv" "llap_mintimes_summary"*".csv"
     rm log_query.zip
 
     hdfs dfs -copyFromLocal "tpch-${SCALE}GB-${ID}.zip" "${FINAL_REPORT_LOCATION}/tpch-${SCALE}GB-${ID}.zip"
